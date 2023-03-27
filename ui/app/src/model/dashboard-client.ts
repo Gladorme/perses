@@ -14,7 +14,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DashboardResource, fetch, fetchJson } from '@perses-dev/core';
 import buildURL from './url-builder';
-import { HTTPHeader, HTTPMethodDELETE, HTTPMethodPOST, HTTPMethodPUT } from './http';
+import { HTTPHeader, HTTPMethodDELETE, HTTPMethodGET, HTTPMethodPOST, HTTPMethodPUT } from './http';
 
 const resource = 'dashboards';
 
@@ -45,8 +45,7 @@ export function useCreateDashboardMutation(
  */
 export function useDashboard(project: string, name: string) {
   return useQuery<DashboardResource, Error>([resource, project, name], () => {
-    const url = buildURL({ resource: resource, name: name, project: project });
-    return fetchJson<DashboardResource>(url);
+    return getDashboard(project, name);
   });
 }
 
@@ -56,8 +55,7 @@ export function useDashboard(project: string, name: string) {
  */
 export function useDashboardList(project?: string) {
   return useQuery<DashboardResource[], Error>([resource, project], () => {
-    const url = buildURL({ resource: resource, project: project });
-    return fetchJson<DashboardResource[]>(url);
+    return getDashboards(project);
   });
 }
 
@@ -105,6 +103,22 @@ export function createDashboard(entity: DashboardResource) {
     method: HTTPMethodPOST,
     headers: HTTPHeader,
     body: JSON.stringify(entity),
+  });
+}
+
+export function getDashboard(project: string, name: string) {
+  const url = buildURL({ resource: resource, project: project, name: name });
+  return fetchJson<DashboardResource>(url, {
+    method: HTTPMethodGET,
+    headers: HTTPHeader,
+  });
+}
+
+export function getDashboards(project?: string) {
+  const url = buildURL({ resource: resource, project: project });
+  return fetchJson<DashboardResource[]>(url, {
+    method: HTTPMethodGET,
+    headers: HTTPHeader,
   });
 }
 

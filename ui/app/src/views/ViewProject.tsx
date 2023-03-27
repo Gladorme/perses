@@ -12,7 +12,7 @@
 // limitations under the License.
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Container, Paper, Stack, Typography, Button } from '@mui/material';
+import { Box, Container, Stack, Typography, Button } from '@mui/material';
 import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
 import FolderPound from 'mdi-material-ui/FolderPound';
 import ViewDashboard from 'mdi-material-ui/ViewDashboard';
@@ -41,27 +41,25 @@ function DashboardPageInProject(props: RenderDashboardInProjectProperties) {
   };
 
   return (
-    <Paper>
-      <Box p={1}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" alignItems="center" gap={1} my={2}>
-            <ViewDashboard />
-            <Typography variant="h3">Dashboards</Typography>
-          </Stack>
-          <Button variant="contained" size="small" onClick={() => setOpenCreateDashboardDialogState(true)}>
-            Add Dashboard
-          </Button>
+    <Box p={1}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Stack direction="row" alignItems="center" gap={1} my={2}>
+          <ViewDashboard />
+          <Typography variant="h3">Dashboards</Typography>
         </Stack>
-        <ErrorBoundary FallbackComponent={ErrorAlert}>
-          <DashboardList dashboardList={data} />
-        </ErrorBoundary>
-        <CreateDashboardDialog
-          open={openCreateDashboardDialogState}
-          onClose={() => setOpenCreateDashboardDialogState(false)}
-          onSuccess={(name: string) => handleDashboardCreation(name)}
-        />
-      </Box>
-    </Paper>
+        <Button variant="contained" size="small" onClick={() => setOpenCreateDashboardDialogState(true)}>
+          Add Dashboard
+        </Button>
+      </Stack>
+      <ErrorBoundary FallbackComponent={ErrorAlert}>
+        <DashboardList dashboardList={data} />
+      </ErrorBoundary>
+      <CreateDashboardDialog
+        open={openCreateDashboardDialogState}
+        onClose={() => setOpenCreateDashboardDialogState(false)}
+        onSuccess={(name: string) => handleDashboardCreation(name)}
+      />
+    </Box>
   );
 }
 
