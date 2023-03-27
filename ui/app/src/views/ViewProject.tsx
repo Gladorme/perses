@@ -11,8 +11,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Container, Paper, Stack, Typography, Button } from '@mui/material';
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
+import {
+  Box,
+  Stack,
+  Grid,
+  Typography,
+  Button,
+  Link,
+  Breadcrumbs,
+  TextField,
+  OutlinedInput,
+  SelectChangeEvent,
+  MenuItem,
+  Checkbox,
+  ListItemText,
+  Select,
+  InputLabel,
+  FormControl,
+} from '@mui/material';
 import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
 import FolderPound from 'mdi-material-ui/FolderPound';
 import ViewDashboard from 'mdi-material-ui/ViewDashboard';
@@ -22,6 +39,8 @@ import DashboardList from '../components/DashboardList';
 import { DeleteProjectDialog } from '../components/DeleteProjectDialog/DeleteProjectDialog';
 import { CreateDashboardDialog } from '../components/CreateDashboardDialog/CreateDashboardDialog';
 
+const tags = ['Test1', 'Test2', 'Test3', 'Test4', 'Test5', 'Test6', 'Test7', 'Test8'];
+
 interface RenderDashboardInProjectProperties {
   projectName: string;
 }
@@ -30,6 +49,7 @@ function DashboardPageInProject(props: RenderDashboardInProjectProperties) {
   const navigate = useNavigate();
 
   const [openCreateDashboardDialogState, setOpenCreateDashboardDialogState] = useState(false);
+  const [filterTags, setFilterTags] = useState<string[]>([]);
 
   const { data } = useDashboardList(props.projectName);
   if (data === undefined) {
@@ -40,28 +60,73 @@ function DashboardPageInProject(props: RenderDashboardInProjectProperties) {
     navigate(`/projects/${props.projectName}/dashboards/${name}/create`);
   };
 
+  const handleChange = (event: SelectChangeEvent<string[]>) => {
+    const {
+      target: { value },
+    } = event;
+    setFilterTags(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value
+    );
+  };
+
   return (
-    <Paper>
-      <Box p={1}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" alignItems="center" gap={1} my={2}>
-            <ViewDashboard />
-            <Typography variant="h3">Dashboards</Typography>
-          </Stack>
-          <Button variant="contained" size="small" onClick={() => setOpenCreateDashboardDialogState(true)}>
+    <Box>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2} sx={{ width: '100%' }}>
+        <Stack direction="row">
+          <ViewDashboard />
+          <Typography variant="h2">Dashboards</Typography>
+        </Stack>
+        <Stack sx={{ width: '100%' }}>
+          <TextField
+            margin="dense"
+            id="search"
+            label="Search"
+            type="text"
+            fullWidth
+            placeholder="Start typing dashboard name..."
+          ></TextField>
+        </Stack>
+        <Stack direction="row" gap={1}>
+          <FormControl sx={{ width: 200 }}>
+            <InputLabel id="demo-simple-select-autowidth-label">Filter</InputLabel>
+            <Select
+              multiple
+              value={filterTags}
+              onChange={handleChange}
+              input={<OutlinedInput label="Tags" />}
+              renderValue={(selected) => selected.join(', ')}
+              label="Filter"
+              placeholder="Start typing label..."
+              fullWidth
+            >
+              {tags.map((tag) => (
+                <MenuItem key={tag} value={tag}>
+                  <Checkbox checked={filterTags.indexOf(tag) > -1} />
+                  <ListItemText primary={tag} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setOpenCreateDashboardDialogState(true)}
+            sx={{ whiteSpace: 'nowrap' }}
+          >
             Add Dashboard
           </Button>
         </Stack>
-        <ErrorBoundary FallbackComponent={ErrorAlert}>
-          <DashboardList dashboardList={data} />
-        </ErrorBoundary>
-        <CreateDashboardDialog
-          open={openCreateDashboardDialogState}
-          onClose={() => setOpenCreateDashboardDialogState(false)}
-          onSuccess={(name: string) => handleDashboardCreation(name)}
-        />
-      </Box>
-    </Paper>
+      </Stack>
+      <ErrorBoundary FallbackComponent={ErrorAlert}>
+        <DashboardList dashboardList={data} />
+      </ErrorBoundary>
+      <CreateDashboardDialog
+        open={openCreateDashboardDialogState}
+        onClose={() => setOpenCreateDashboardDialogState(false)}
+        onSuccess={(name: string) => handleDashboardCreation(name)}
+      />
+    </Box>
   );
 }
 
@@ -87,8 +152,14 @@ function ViewProject() {
   );
 
   return (
-    <>
-      <Container maxWidth="md" sx={{ marginY: 2 }}>
+    <Stack sx={{ width: '100%' }} m={2} gap={2}>
+      <Breadcrumbs sx={{ fontSize: 'large' }}>
+        <Link underline={'hover'} variant={'h3'} component={RouterLink} to={'/'}>
+          Home
+        </Link>
+        <Typography variant={'h3'}>{projectName}</Typography>
+      </Breadcrumbs>
+      <Box sx={{ width: '100%' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Stack direction="row" alignItems="center" gap={1} mb={2}>
             <FolderPound fontSize={'large'} />
@@ -98,15 +169,22 @@ function ViewProject() {
             Delete
           </Button>
         </Stack>
-        <DashboardPageInProject projectName={projectName} />
-      </Container>
-      <DeleteProjectDialog
-        name={projectName}
-        open={isDeleteProjectDialogOpen}
-        onClose={handleDeleteProjectDialogClose}
-        onSuccess={handleDeleteProjectDialogSuccess}
-      />
-    </>
+        <DeleteProjectDialog
+          name={projectName}
+          open={isDeleteProjectDialogOpen}
+          onClose={handleDeleteProjectDialogClose}
+          onSuccess={handleDeleteProjectDialogSuccess}
+        />
+      </Box>
+      <Grid container spacing={8}>
+        <Grid item xs={8}>
+          <DashboardPageInProject projectName={projectName} />
+        </Grid>
+        <Grid item xs={4}>
+          <Typography variant="h2">Recent</Typography>
+        </Grid>
+      </Grid>
+    </Stack>
   );
 }
 
