@@ -18,7 +18,7 @@ import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
 import { PluginRegistry } from '@perses-dev/plugin-system';
 import { DashboardResource } from '@perses-dev/core';
 import { dashboardDisplayName, dashboardExtendedDisplayName } from '@perses-dev/core/dist/utils/text';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { bundledPluginLoader } from '../model/bundled-plugins';
 import { useCreateDashboardMutation, useDashboard, useUpdateDashboardMutation } from '../model/dashboard-client';
 import { useDatasourceApi } from '../model/datasource-api';
@@ -26,6 +26,7 @@ import DashboardBreadcrumbs from '../components/DashboardBreadcrumbs';
 import { useIsReadonly } from '../model/config-client';
 import { useSnackbar } from '../context/SnackbarProvider';
 import { CreateAction } from '../model/action';
+import { useNavHistoryDispatch } from '../context/DashboardNavHistory';
 
 /**
  * Generated a resource name valid for the API.
@@ -59,6 +60,12 @@ function ViewDashboard() {
 
   const createDashboardMutation = useCreateDashboardMutation();
   const updateDashboardMutation = useUpdateDashboardMutation();
+
+  const navHistoryDispatch = useNavHistoryDispatch();
+  useEffect(
+    () => navHistoryDispatch({ project: projectName, name: dashboardName }),
+    [navHistoryDispatch, projectName, dashboardName]
+  );
 
   let isEditing = false;
 
@@ -152,7 +159,8 @@ function ViewDashboard() {
               datasourceApi={datasourceApi}
               dashboardTitleComponent={
                 <DashboardBreadcrumbs
-                  dashboardName={data.spec.display ? data.spec.display.name : data.metadata.name}
+                  dashboardName={data.metadata.name}
+                  dashboardDisplayName={data.spec.display?.name}
                   dashboardProject={data.metadata.project}
                 />
               }

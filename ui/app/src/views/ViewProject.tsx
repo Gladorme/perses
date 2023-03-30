@@ -12,15 +12,18 @@
 // limitations under the License.
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Container, Stack, Typography, Button } from '@mui/material';
+import { Box, Stack, Typography, Button } from '@mui/material';
 import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
 import FolderPound from 'mdi-material-ui/FolderPound';
 import ViewDashboard from 'mdi-material-ui/ViewDashboard';
+import HistoryIcon from 'mdi-material-ui/History';
 import { useCallback, useState } from 'react';
 import { useDashboardList } from '../model/dashboard-client';
 import DashboardList from '../components/DashboardList';
 import { DeleteProjectDialog } from '../components/DeleteProjectDialog/DeleteProjectDialog';
 import { CreateDashboardDialog } from '../components/CreateDashboardDialog/CreateDashboardDialog';
+import DashboardBreadcrumbs from '../components/DashboardBreadcrumbs';
+import { useNavHistory } from '../context/DashboardNavHistory';
 
 interface RenderDashboardInProjectProperties {
   projectName: string;
@@ -41,7 +44,7 @@ function DashboardPageInProject(props: RenderDashboardInProjectProperties) {
   };
 
   return (
-    <Box p={1}>
+    <Box>
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Stack direction="row" alignItems="center" gap={1} my={2}>
           <ViewDashboard />
@@ -50,6 +53,47 @@ function DashboardPageInProject(props: RenderDashboardInProjectProperties) {
         <Button variant="contained" size="small" onClick={() => setOpenCreateDashboardDialogState(true)}>
           Add Dashboard
         </Button>
+      </Stack>
+      <ErrorBoundary FallbackComponent={ErrorAlert}>
+        <DashboardList dashboardList={data} />
+      </ErrorBoundary>
+      <CreateDashboardDialog
+        open={openCreateDashboardDialogState}
+        onClose={() => setOpenCreateDashboardDialogState(false)}
+        onSuccess={(name: string) => handleDashboardCreation(name)}
+      />
+    </Box>
+  );
+}
+
+interface RecentVisitedDashboardsInProjectProperties {
+  projectName: string;
+}
+
+function RecentVisitedDashboardsInProject(props: RecentVisitedDashboardsInProjectProperties) {
+  const navigate = useNavigate();
+  const history = useNavHistory();
+
+  console.log(history);
+
+  const [openCreateDashboardDialogState, setOpenCreateDashboardDialogState] = useState(false);
+
+  const { data } = useDashboardList(props.projectName);
+  if (data === undefined) {
+    return null;
+  }
+
+  const handleDashboardCreation = function (name: string) {
+    navigate(`/projects/${props.projectName}/dashboards/${name}/create`);
+  };
+
+  return (
+    <Box>
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Stack direction="row" alignItems="center" gap={1} my={2}>
+          <HistoryIcon />
+          <Typography variant="h3">Recently Visited</Typography>
+        </Stack>
       </Stack>
       <ErrorBoundary FallbackComponent={ErrorAlert}>
         <DashboardList dashboardList={data} />
@@ -85,26 +129,40 @@ function ViewProject() {
   );
 
   return (
-    <>
-      <Container maxWidth="md" sx={{ marginY: 2 }}>
+    <Stack sx={{ width: '100%' }} m={2} gap={2}>
+      <DashboardBreadcrumbs dashboardProject={projectName} />
+      <Box sx={{ width: '100%' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" alignItems="center" gap={1} mb={2}>
+          <Stack direction="row" alignItems="center" gap={1}>
             <FolderPound fontSize={'large'} />
             <Typography variant="h1">{projectName}</Typography>
           </Stack>
-          <Button variant="outlined" color="error" size="small" onClick={handleDeleteProjectDialogOpen}>
-            Delete
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            sx={{ textTransform: 'uppercase' }}
+            onClick={handleDeleteProjectDialogOpen}
+          >
+            Delete Project
           </Button>
         </Stack>
-        <DashboardPageInProject projectName={projectName} />
-      </Container>
-      <DeleteProjectDialog
-        name={projectName}
-        open={isDeleteProjectDialogOpen}
-        onClose={handleDeleteProjectDialogClose}
-        onSuccess={handleDeleteProjectDialogSuccess}
-      />
-    </>
+        <DeleteProjectDialog
+          name={projectName}
+          open={isDeleteProjectDialogOpen}
+          onClose={handleDeleteProjectDialogClose}
+          onSuccess={handleDeleteProjectDialogSuccess}
+        />
+      </Box>
+      <Box sx={{ display: 'flex' }} flexDirection={'row'} gap={8}>
+        <Box flexGrow={4}>
+          <DashboardPageInProject projectName={projectName} />
+        </Box>
+        <Box flexGrow={1}>
+          <RecentVisitedDashboardsInProject projectName={projectName} />
+        </Box>
+      </Box>
+    </Stack>
   );
 }
 
