@@ -152,7 +152,8 @@ function ViewDashboard() {
               datasourceApi={datasourceApi}
               dashboardTitleComponent={
                 <DashboardBreadcrumbs
-                  dashboardName={data.spec.display ? data.spec.display.name : data.metadata.name}
+                  dashboardName={data.metadata.name}
+                  dashboardDisplayName={data.spec.display?.name}
                   dashboardProject={data.metadata.project}
                 />
               }

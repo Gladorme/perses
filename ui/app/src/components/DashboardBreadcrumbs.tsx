@@ -11,22 +11,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Breadcrumbs, Link, Typography } from '@mui/material';
+import { Breadcrumbs, Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 interface DashboardBreadcrumbsProps {
-  dashboardName: string;
+  dashboardName?: string;
+  dashboardDisplayName?: string;
   dashboardProject: string;
 }
 
 function DashboardBreadcrumbs(props: DashboardBreadcrumbsProps) {
-  const { dashboardName, dashboardProject } = props;
+  const { dashboardName, dashboardDisplayName, dashboardProject } = props;
   return (
     <Breadcrumbs sx={{ fontSize: 'large' }}>
-      <Link underline={'hover'} variant={'h2'} component={RouterLink} to={`/projects/${dashboardProject}`}>
+      <Link underline={'hover'} variant={'h3'} component={RouterLink} to={'/'}>
+        Home
+      </Link>
+      <Link underline={'hover'} variant={'h3'} component={RouterLink} to={`/projects/${dashboardProject}`}>
         {dashboardProject}
       </Link>
-      <Typography variant={'h2'}>{dashboardName}</Typography>
+      {dashboardName && (
+        <Link
+          underline={'hover'}
+          variant={'h3'}
+          component={RouterLink}
+          to={`/projects/${dashboardProject}/dashboards/${dashboardName}`}
+        >
+          {dashboardDisplayName ? dashboardDisplayName : dashboardName}
+        </Link>
+      )}
     </Breadcrumbs>
   );
 }
