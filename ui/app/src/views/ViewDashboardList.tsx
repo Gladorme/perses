@@ -34,7 +34,7 @@ import DeleteOutline from 'mdi-material-ui/DeleteOutline';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardList } from '../model/dashboard-client';
 import { ProjectModel } from '../model/project-client';
-import { DashboardList } from '../components/DashboardList';
+import { DashboardList } from '../components/DashboardList/DashboardList';
 import { DeleteProjectDialog } from '../components/DeleteProjectDialog/DeleteProjectDialog';
 import { AddProjectDialog } from '../components/AddProjectDialog/AddProjectDialog';
 

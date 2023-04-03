@@ -17,13 +17,14 @@ import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
 import FolderPound from 'mdi-material-ui/FolderPound';
 import ViewDashboard from 'mdi-material-ui/ViewDashboard';
 import HistoryIcon from 'mdi-material-ui/History';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useDashboardList } from '../model/dashboard-client';
-import { DashboardList } from '../components/DashboardList';
+import { DashboardList } from '../components/DashboardList/DashboardList';
 import { DeleteProjectDialog } from '../components/DeleteProjectDialog/DeleteProjectDialog';
 import { CreateDashboardDialog } from '../components/CreateDashboardDialog/CreateDashboardDialog';
 import DashboardBreadcrumbs from '../components/DashboardBreadcrumbs';
 import { useNavHistory } from '../context/DashboardNavHistory';
+import { DatedDashboards, RecentDashboardList } from '../components/DashboardList/RecentDashboardList';
 
 interface RenderDashboardInProjectProperties {
   projectName: string;
@@ -74,14 +75,21 @@ function RecentVisitedDashboardsInProject(props: RecentVisitedDashboardsInProjec
   const navigate = useNavigate();
   const history = useNavHistory();
 
-  console.log(history);
-
   const [openCreateDashboardDialogState, setOpenCreateDashboardDialogState] = useState(false);
 
   const { data } = useDashboardList(props.projectName);
-  if (data === undefined) {
-    return null;
-  }
+  const recentDashboard = useMemo(() => {
+    const result: DatedDashboards[] = [];
+    (data || []).forEach((dashboard) => {
+      const item = history.find(
+        (item) => item.project === dashboard.metadata.project && item.name === dashboard.metadata.name
+      );
+      if (item) {
+        result.push({ dashboard: dashboard, date: item.date });
+      }
+    });
+    return result;
+  }, [data, history]);
 
   const handleDashboardCreation = function (name: string) {
     navigate(`/projects/${props.projectName}/dashboards/${name}/create`);
@@ -96,7 +104,7 @@ function RecentVisitedDashboardsInProject(props: RecentVisitedDashboardsInProjec
         </Stack>
       </Stack>
       <ErrorBoundary FallbackComponent={ErrorAlert}>
-        <DashboardList dashboardList={data} />
+        <RecentDashboardList dashboardList={recentDashboard} />
       </ErrorBoundary>
       <CreateDashboardDialog
         open={openCreateDashboardDialogState}

@@ -13,98 +13,14 @@
 
 import { DashboardResource } from '@perses-dev/core';
 import { Box, Stack } from '@mui/material';
-import {
-  DataGrid,
-  GridColDef,
-  GridActionsCellItem,
-  GridRowParams,
-  GridValueGetterParams,
-  GridToolbarContainer,
-  GridToolbarColumnsButton,
-  GridToolbarFilterButton,
-  GridToolbarQuickFilter,
-  GridRow,
-  GridColumnHeaders,
-} from '@mui/x-data-grid';
+import { GridColDef, GridActionsCellItem, GridRowParams, GridValueGetterParams } from '@mui/x-data-grid';
 import DeleteIcon from 'mdi-material-ui/DeleteOutline';
 import PencilIcon from 'mdi-material-ui/Pencil';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { dashboardDisplayName } from '@perses-dev/core/dist/utils/text';
-import { useNavigate } from 'react-router-dom';
-import { GridInitialStateCommunity } from '@mui/x-data-grid/models/gridStateCommunity';
-import { DeleteDashboardDialog } from './DeleteDashboardDialog/DeleteDashboardDialog';
-import { RenameDashboardDialog } from './RenameDashboardDialog/RenameDashboardDialog';
-
-// https://mui.com/x/react-data-grid/performance/
-const MemoizedRow = memo(GridRow);
-const MemoizedColumnHeaders = memo(GridColumnHeaders);
-
-interface Row {
-  project: string;
-  name: string;
-  displayName: string;
-  version: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface RowHistory extends Row {
-  lastViewed: string;
-}
-
-function DashboardsGridToolbar() {
-  return (
-    <GridToolbarContainer>
-      <Stack direction="row" width="100%" gap={4} m={2}>
-        <Stack sx={{ flexShrink: 1 }} width="100%">
-          <GridToolbarQuickFilter sx={{ width: '100%' }} />
-        </Stack>
-        <Stack direction="row" sx={{ flexShrink: 3 }} width="100%">
-          <GridToolbarColumnsButton sx={{ width: '100%' }} />
-          <GridToolbarFilterButton sx={{ width: '100%' }} />
-        </Stack>
-      </Stack>
-    </GridToolbarContainer>
-  );
-}
-
-interface DashboardDataGridProperties {
-  columns: Array<GridColDef<Row | RowHistory>>;
-  rows: Row[] | RowHistory[];
-  initialState?: GridInitialStateCommunity;
-}
-
-function DashboardDataGrid(props: DashboardDataGridProperties) {
-  const { columns, rows } = props;
-
-  const navigate = useNavigate();
-
-  return (
-    <DataGrid
-      onRowClick={(params) => navigate(`/projects/${params.row.project}/dashboards/${params.row.name}`)}
-      rows={rows}
-      columns={columns}
-      getRowId={(row) => row.name}
-      slots={{ toolbar: DashboardsGridToolbar, row: MemoizedRow, columnHeaders: MemoizedColumnHeaders }}
-      pageSizeOptions={[10, 25, 50, 100]}
-      initialState={{
-        columns: {
-          columnVisibilityModel: {
-            project: false,
-            id: false,
-            version: false,
-          },
-        },
-        sorting: {
-          sortModel: [{ field: 'displayName', sort: 'asc' }],
-        },
-        pagination: {
-          paginationModel: { pageSize: 10, page: 0 },
-        },
-      }}
-    ></DataGrid>
-  );
-}
+import { DeleteDashboardDialog } from '../DeleteDashboardDialog/DeleteDashboardDialog';
+import { RenameDashboardDialog } from '../RenameDashboardDialog/RenameDashboardDialog';
+import { DashboardDataGrid, Row } from './DashboardDataGrid';
 
 export interface DashboardListProperties {
   dashboardList: DashboardResource[];
