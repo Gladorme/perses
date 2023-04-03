@@ -12,8 +12,7 @@
 // limitations under the License.
 
 import { AbsoluteTimeRange, StepOptions } from '@perses-dev/core';
-import { OPTIMIZED_MODE_SERIES_LIMIT } from '@perses-dev/components';
-import { EChartsTimeSeries, EChartsValues } from '@perses-dev/components';
+import { OPTIMIZED_MODE_SERIES_LIMIT, EChartsTimeSeries, EChartsValues } from '@perses-dev/components';
 import { TimeSeries, useTimeSeriesQueries } from '@perses-dev/plugin-system';
 import { gcd } from '../../../utils/mathjs';
 import {
@@ -150,6 +149,7 @@ export function getLineSeries(
     data: data,
     connectNulls: visual.connect_nulls ?? DEFAULT_CONNECT_NULLS,
     color: getRandomColor(name), // use full series name as generated color seed (must match param in legendItems)
+    stack: visual.stack === 'All' ? visual.stack : undefined,
     sampling: 'lttb',
     progressiveThreshold: OPTIMIZED_MODE_SERIES_LIMIT, // https://echarts.apache.org/en/option.html#series-lines.progressiveThreshold
     showSymbol: visual.show_points === 'Always' ? true : false,

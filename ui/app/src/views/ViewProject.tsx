@@ -19,7 +19,7 @@ import ViewDashboard from 'mdi-material-ui/ViewDashboard';
 import HistoryIcon from 'mdi-material-ui/History';
 import { useCallback, useState } from 'react';
 import { useDashboardList } from '../model/dashboard-client';
-import DashboardList from '../components/DashboardList';
+import { DashboardList } from '../components/DashboardList';
 import { DeleteProjectDialog } from '../components/DeleteProjectDialog/DeleteProjectDialog';
 import { CreateDashboardDialog } from '../components/CreateDashboardDialog/CreateDashboardDialog';
 import DashboardBreadcrumbs from '../components/DashboardBreadcrumbs';

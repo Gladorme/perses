@@ -78,7 +78,7 @@ function ViewMigrate() {
     setGrafanaInput(grafanaInput);
   };
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="md" sx={{ marginY: 2 }}>
       <Stack direction="row" alignItems="center" gap={1} mb={2}>
         <AutoFix fontSize={'large'} />
         <Typography variant="h1">Migrate</Typography>
@@ -86,9 +86,16 @@ function ViewMigrate() {
       <Stack direction={'column'} spacing={1} mt={2}>
         <Alert variant={'outlined'} severity={'warning'}>
           <Typography>
-            As we do not support every feature from Grafana, the migration to Perses can only be partial. Some panels
-            for example will not be migrated but instead replaced by a Markdown panel with a text explaining we are not
-            able to migrate your panel.
+            As we do not support every feature from Grafana, the migration to Perses can only be partial. For example,
+            unsupported panels are replaced by &quot;placeholder&quot; Markdown panels, to at least preserve the
+            dashboard structure.
+          </Typography>
+        </Alert>
+        <Alert variant={'outlined'} severity={'warning'}>
+          <Typography>
+            It is recommended to <u>collapse all the rows</u> of your Grafana dashboard before attempting to migrate it.
+            This ensures that your dashboard structure wont be alterated & that Library panels will get migrated nicely
+            (deep copied).
           </Typography>
         </Alert>
         <Button

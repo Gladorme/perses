@@ -31,6 +31,7 @@ import PencilIcon from 'mdi-material-ui/Pencil';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { dashboardDisplayName } from '@perses-dev/core/dist/utils/text';
 import { useNavigate } from 'react-router-dom';
+import { GridInitialStateCommunity } from '@mui/x-data-grid/models/gridStateCommunity';
 import { DeleteDashboardDialog } from './DeleteDashboardDialog/DeleteDashboardDialog';
 import { RenameDashboardDialog } from './RenameDashboardDialog/RenameDashboardDialog';
 
@@ -45,6 +46,10 @@ interface Row {
   version: number;
   createdAt: string;
   updatedAt: string;
+}
+
+interface RowHistory extends Row {
+  lastViewed: string;
 }
 
 function DashboardsGridToolbar() {
@@ -63,11 +68,49 @@ function DashboardsGridToolbar() {
   );
 }
 
+interface DashboardDataGridProperties {
+  columns: Array<GridColDef<Row | RowHistory>>;
+  rows: Row[] | RowHistory[];
+  initialState?: GridInitialStateCommunity;
+}
+
+function DashboardDataGrid(props: DashboardDataGridProperties) {
+  const { columns, rows } = props;
+
+  const navigate = useNavigate();
+
+  return (
+    <DataGrid
+      onRowClick={(params) => navigate(`/projects/${params.row.project}/dashboards/${params.row.name}`)}
+      rows={rows}
+      columns={columns}
+      getRowId={(row) => row.name}
+      slots={{ toolbar: DashboardsGridToolbar, row: MemoizedRow, columnHeaders: MemoizedColumnHeaders }}
+      pageSizeOptions={[10, 25, 50, 100]}
+      initialState={{
+        columns: {
+          columnVisibilityModel: {
+            project: false,
+            id: false,
+            version: false,
+          },
+        },
+        sorting: {
+          sortModel: [{ field: 'displayName', sort: 'asc' }],
+        },
+        pagination: {
+          paginationModel: { pageSize: 10, page: 0 },
+        },
+      }}
+    ></DataGrid>
+  );
+}
+
 export interface DashboardListProperties {
   dashboardList: DashboardResource[];
 }
 
-function DashboardList(props: DashboardListProperties) {
+export function DashboardList(props: DashboardListProperties) {
   const { dashboardList } = props;
 
   const getDashboard = useCallback(
@@ -95,8 +138,6 @@ function DashboardList(props: DashboardListProperties) {
       )
     );
   }, [setRows, dashboardList]);
-
-  const navigate = useNavigate();
 
   const [targetedDashboard, setTargetedDashboard] = useState<DashboardResource>();
   const [isRenameDashboardDialogStateOpened, setRenameDashboardDialogStateOpened] = useState<boolean>(false);
@@ -174,13 +215,9 @@ function DashboardList(props: DashboardListProperties) {
 
   return (
     <Stack width="100%" height={700}>
-      <DataGrid
-        onRowClick={(params) => navigate(`/projects/${params.row.project}/dashboards/${params.row.name}`)}
+      <DashboardDataGrid
         rows={rows}
         columns={columns}
-        getRowId={(row) => row.name}
-        slots={{ toolbar: DashboardsGridToolbar, row: MemoizedRow, columnHeaders: MemoizedColumnHeaders }}
-        pageSizeOptions={[10, 25, 50, 100]}
         initialState={{
           columns: {
             columnVisibilityModel: {
@@ -196,7 +233,7 @@ function DashboardList(props: DashboardListProperties) {
             paginationModel: { pageSize: 10, page: 0 },
           },
         }}
-      ></DataGrid>
+      ></DashboardDataGrid>
       <Box>
         {targetedDashboard && (
           <Box>
@@ -216,5 +253,3 @@ function DashboardList(props: DashboardListProperties) {
     </Stack>
   );
 }
-
-export default DashboardList;

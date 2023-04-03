@@ -15,7 +15,7 @@ import React, { createContext, useContext, useReducer, Dispatch, useMemo } from 
 
 const PERSES_DASHBOARD_NAV_HISTORY_KEY = 'PERSES_DASHBOARD_NAV_HISTORY';
 
-interface DashboardNavHistoryItem {
+export interface DashboardNavHistoryItem {
   project: string;
   name: string;
   date: string;
