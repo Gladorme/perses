@@ -20,6 +20,7 @@ import {
   DatasourceStoreProviderProps,
   DatasourceStoreProvider,
 } from '../../context';
+import { GlobalVariableProvider } from '../../context/GlobalVariableProvider/GlobalVariableProvider';
 import { DashboardApp, DashboardAppProps } from './DashboardApp';
 
 export interface ViewDashboardProps extends Omit<BoxProps, 'children'>, DashboardAppProps {
@@ -52,33 +53,35 @@ export function ViewDashboard(props: ViewDashboardProps) {
     <DatasourceStoreProvider dashboardResource={dashboardResource} datasourceApi={datasourceApi}>
       <DashboardProvider initialState={{ dashboardResource, isEditMode: !!isEditing }}>
         <TimeRangeProvider initialTimeRange={initialTimeRange} enabledURLParams={true}>
-          <TemplateVariableProvider initialVariableDefinitions={spec.variables}>
-            <Box
-              sx={combineSx(
-                {
-                  display: 'flex',
-                  width: '100%',
-                  height: '100%',
-                  position: 'relative',
-                  overflow: 'hidden',
-                },
-                sx
-              )}
-              {...others}
-            >
-              <ErrorBoundary FallbackComponent={ErrorAlert}>
-                <DashboardApp
-                  dashboardResource={dashboardResource}
-                  dashboardTitleComponent={dashboardTitleComponent}
-                  emptyDashboardProps={emptyDashboardProps}
-                  onSave={onSave}
-                  onDiscard={onDiscard}
-                  initialVariableIsSticky={initialVariableIsSticky}
-                  isReadonly={isReadonly}
-                />
-              </ErrorBoundary>
-            </Box>
-          </TemplateVariableProvider>
+          <GlobalVariableProvider dashboardName={dashboardResource.metadata.name}>
+            <TemplateVariableProvider initialVariableDefinitions={spec.variables}>
+              <Box
+                sx={combineSx(
+                  {
+                    display: 'flex',
+                    width: '100%',
+                    height: '100%',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  },
+                  sx
+                )}
+                {...others}
+              >
+                <ErrorBoundary FallbackComponent={ErrorAlert}>
+                  <DashboardApp
+                    dashboardResource={dashboardResource}
+                    dashboardTitleComponent={dashboardTitleComponent}
+                    emptyDashboardProps={emptyDashboardProps}
+                    onSave={onSave}
+                    onDiscard={onDiscard}
+                    initialVariableIsSticky={initialVariableIsSticky}
+                    isReadonly={isReadonly}
+                  />
+                </ErrorBoundary>
+              </Box>
+            </TemplateVariableProvider>
+          </GlobalVariableProvider>
         </TimeRangeProvider>
       </DashboardProvider>
     </DatasourceStoreProvider>
