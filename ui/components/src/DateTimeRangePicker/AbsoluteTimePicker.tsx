@@ -136,7 +136,7 @@ export const AbsoluteTimePicker = ({ initialTimeRange, onChange, onCancel }: Abs
               onAccept={() => {
                 setShowStartCalendar(false);
               }}
-              renderInput={(params) => <TextField {...params} />}
+              // slotProps={{ textField: { variant: 'outlined' } }}
             />
           </Box>
         )}
@@ -172,7 +172,7 @@ export const AbsoluteTimePicker = ({ initialTimeRange, onChange, onCancel }: Abs
                 setShowStartCalendar(true);
                 onChangeEndTime(newValue);
               }}
-              renderInput={(params) => <TextField {...params} />}
+              // slotProps={{ textField: {} }}
             />
           </Box>
         )}
