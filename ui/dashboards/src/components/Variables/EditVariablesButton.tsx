@@ -19,7 +19,7 @@ import { VariableDefinition } from '@perses-dev/core';
 
 import { TOOLTIP_TEXT } from '../../constants';
 import { useTemplateVariableDefinitions, useTemplateVariableActions } from '../../context';
-import { VariableEditor } from './VariableEditor';
+import { DashboardVariableEditor } from './VariableEditor';
 
 export interface EditVariablesButtonProps extends Pick<ButtonProps, 'fullWidth'> {
   /**
@@ -77,7 +77,7 @@ export function EditVariablesButton({
         PaperProps={{ sx: { width: '50%' } }}
         data-testid="variable-editor"
       >
-        <VariableEditor
+        <DashboardVariableEditor
           variableDefinitions={variableDefinitions}
           onCancel={closeVariableEditor}
           onChange={(variables: VariableDefinition[]) => {

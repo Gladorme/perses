@@ -59,6 +59,35 @@ function getValidation(variableDefinitions: VariableDefinition[]) {
   };
 }
 
+interface DashboardVariableEditorProps {
+  variableDefinitions: VariableDefinition[];
+  onChange: (variableDefinitions: VariableDefinition[]) => void;
+  onCancel: () => void;
+}
+
+export function DashboardVariableEditor(props: DashboardVariableEditorProps) {
+  const { openDiscardChangesConfirmationDialog, closeDiscardChangesConfirmationDialog } =
+    useDiscardChangesConfirmationDialog();
+
+  const handleCancel = () => {
+    openDiscardChangesConfirmationDialog({
+      onDiscardChanges: () => {
+        closeDiscardChangesConfirmationDialog();
+        props.onCancel();
+      },
+      onCancel: () => {
+        closeDiscardChangesConfirmationDialog();
+      },
+      description:
+        'You have unapplied changes. Are you sure you want to discard these changes? Changes cannot be recovered.',
+    });
+  };
+
+  return (
+    <VariableEditor variableDefinitions={props.variableDefinitions} onChange={props.onChange} onCancel={handleCancel} />
+  );
+}
+
 export function VariableEditor(props: {
   variableDefinitions: VariableDefinition[];
   onChange: (variableDefinitions: VariableDefinition[]) => void;
@@ -70,24 +99,8 @@ export function VariableEditor(props: {
   const validation = useMemo(() => getValidation(variableDefinitions), [variableDefinitions]);
   const currentEditingVariableDefinition = typeof variableEditIdx === 'number' && variableDefinitions[variableEditIdx];
 
-  const { openDiscardChangesConfirmationDialog, closeDiscardChangesConfirmationDialog } =
-    useDiscardChangesConfirmationDialog();
   const handleCancel = () => {
-    if (JSON.stringify(props.variableDefinitions) !== JSON.stringify(variableDefinitions)) {
-      openDiscardChangesConfirmationDialog({
-        onDiscardChanges: () => {
-          closeDiscardChangesConfirmationDialog();
-          props.onCancel();
-        },
-        onCancel: () => {
-          closeDiscardChangesConfirmationDialog();
-        },
-        description:
-          'You have unapplied changes. Are you sure you want to discard these changes? Changes cannot be recovered.',
-      });
-    } else {
-      props.onCancel();
-    }
+    props.onCancel();
   };
 
   const removeVariable = (index: number) => {

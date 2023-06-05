@@ -19,7 +19,7 @@ import { DeleteProjectDialog } from '../../components/DeleteProjectDialog/Delete
 import DashboardBreadcrumbs from '../../components/DashboardBreadcrumbs';
 import { CRUDButton } from '../../components/CRUDButton/CRUDButton';
 import { RecentlyViewedDashboards } from './RecentlyViewedDashboards';
-import { ProjectDashboards } from './ProjectDashboards';
+import { DashboardVariableTabs } from './DashboardVariableTabs';
 
 function ProjectView() {
   const { projectName } = useParams();
@@ -62,7 +62,7 @@ function ProjectView() {
       </Box>
       <Grid container columnSpacing={8}>
         <Grid item xs={12} lg={8}>
-          <ProjectDashboards projectName={projectName} id="main-dashboard-list" />
+          <DashboardVariableTabs projectName={projectName} />
         </Grid>
         <Grid item xs={12} lg={4}>
           <RecentlyViewedDashboards projectName={projectName} id="recent-dashboard-list" />
