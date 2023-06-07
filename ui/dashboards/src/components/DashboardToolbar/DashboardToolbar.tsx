@@ -18,7 +18,7 @@ import { AddPanelButton } from '../AddPanelButton';
 import { AddGroupButton } from '../AddGroupButton';
 import { DownloadButton } from '../DownloadButton';
 import { TimeRangeControls } from '../TimeRangeControls';
-import { EditVariablesButton } from '../Variables';
+import { EditDashboardVariablesButton } from '../Variables';
 import { EditButton } from '../EditButton';
 import { EditJsonButton } from '../EditJsonButton';
 import { SaveDashboardButton } from '../SaveDashboardButton';
@@ -96,7 +96,7 @@ export const DashboardToolbar = (props: DashboardToolbarProps) => {
             {isBiggerThanMd ? (
               // On bigger screens, make it one row
               <Stack direction="row" spacing={1} marginLeft="auto" sx={{ whiteSpace: 'nowrap' }}>
-                <EditVariablesButton />
+                <EditDashboardVariablesButton />
                 <AddPanelButton />
                 <AddGroupButton />
                 <TimeRangeControls />
@@ -112,7 +112,7 @@ export const DashboardToolbar = (props: DashboardToolbarProps) => {
                   <EditJsonButton />
                 </Stack>
                 <Stack direction="row" spacing={1} marginLeft="auto" sx={{ whiteSpace: 'nowrap' }}>
-                  <EditVariablesButton />
+                  <EditDashboardVariablesButton />
                   <AddPanelButton />
                   <AddGroupButton />
                 </Stack>

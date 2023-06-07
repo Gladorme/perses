@@ -14,7 +14,7 @@
 import { Typography, Box } from '@mui/material';
 import { useEditMode } from '../../context';
 import { AddPanelButton } from '../AddPanelButton';
-import { EditVariablesButton } from '../Variables';
+import { EditDashboardVariablesButton } from '../Variables';
 import { EditButton } from '../EditButton';
 
 export interface EmptyDashboardProps {
@@ -90,7 +90,7 @@ const EmptyDashboardActions = ({ actions, isEditMode, onEditButtonClick }: Empty
     return (
       <>
         <AddPanelButton variant="outlined" color="secondary" label="Add Panel" fullWidth />
-        <EditVariablesButton variant="outlined" color="secondary" label="Add Variables" fullWidth />
+        <EditDashboardVariablesButton variant="outlined" color="secondary" label="Add Variables" fullWidth />
       </>
     );
   }

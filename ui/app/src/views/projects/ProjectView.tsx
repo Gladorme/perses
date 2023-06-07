@@ -14,10 +14,16 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Stack, Typography, Grid } from '@mui/material';
 import FolderPound from 'mdi-material-ui/FolderPound';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { DatasourceStoreProvider, EditProjectVariablesButton } from '@perses-dev/dashboards';
+import { VariableDefinition } from '@perses-dev/core';
+import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
+import { PluginRegistry } from '@perses-dev/plugin-system';
 import { DeleteProjectDialog } from '../../components/DeleteProjectDialog/DeleteProjectDialog';
 import DashboardBreadcrumbs from '../../components/DashboardBreadcrumbs';
 import { CRUDButton } from '../../components/CRUDButton/CRUDButton';
+import { bundledPluginLoader } from '../../model/bundled-plugins';
+import { CachedDatasourceAPI, HTTPDatasourceAPI } from '../../model/datasource-api';
 import { RecentlyViewedDashboards } from './RecentlyViewedDashboards';
 import { ProjectDashboards } from './ProjectDashboards';
 
@@ -30,6 +36,13 @@ function ProjectView() {
   // Navigate to the home page if the project has been successfully deleted
   const navigate = useNavigate();
   const handleDeleteProjectDialogSuccess = useCallback(() => navigate(`/`), [navigate]);
+
+  const [datasourceApi] = useState(() => new CachedDatasourceAPI(new HTTPDatasourceAPI()));
+  useEffect(() => {
+    // warm up the caching of the datasources
+    datasourceApi.listDatasources(projectName);
+    datasourceApi.listGlobalDatasources();
+  }, [datasourceApi, projectName]);
 
   // Open/Close management for the "Delete Project" dialog
   const [isDeleteProjectDialogOpen, setIsDeleteProjectDialogOpen] = useState<boolean>(false);
@@ -51,7 +64,27 @@ function ProjectView() {
             <FolderPound fontSize={'large'} />
             <Typography variant="h1">{projectName}</Typography>
           </Stack>
-          <CRUDButton text="Delete Project" variant="outlined" color="error" onClick={handleDeleteProjectDialogOpen} />
+          <Stack flexDirection="row" gap={2}>
+            <ErrorBoundary FallbackComponent={ErrorAlert}>
+              <PluginRegistry
+                pluginLoader={bundledPluginLoader}
+                defaultPluginKinds={{
+                  Panel: 'TimeSeriesChart',
+                  TimeSeriesQuery: 'PrometheusTimeSeriesQuery',
+                }}
+              >
+                <DatasourceStoreProvider datasourceApi={datasourceApi} projectName={projectName}>
+                  <EditProjectVariablesButton variant="contained" />
+                </DatasourceStoreProvider>
+              </PluginRegistry>
+            </ErrorBoundary>
+            <CRUDButton
+              text="Delete Project"
+              variant="outlined"
+              color="error"
+              onClick={handleDeleteProjectDialogOpen}
+            />
+          </Stack>
           <DeleteProjectDialog
             name={projectName}
             open={isDeleteProjectDialogOpen}

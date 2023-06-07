@@ -16,37 +16,33 @@ import { Button, ButtonProps } from '@mui/material';
 import PencilIcon from 'mdi-material-ui/PencilOutline';
 import { Drawer, InfoTooltip } from '@perses-dev/components';
 import { VariableDefinition } from '@perses-dev/core';
-
+import { VariableBox } from 'mdi-material-ui';
 import { TOOLTIP_TEXT } from '../../constants';
-import { useTemplateVariableDefinitions, useTemplateVariableActions } from '../../context';
+import {
+  useDiscardChangesConfirmationDialog,
+  useTemplateVariableActions,
+  useTemplateVariableDefinitions,
+} from '../../context';
 import { VariableEditor } from './VariableEditor';
 
-export interface EditVariablesButtonProps extends Pick<ButtonProps, 'fullWidth'> {
-  /**
-   * The variant to use to display the button.
-   */
-  variant?: 'text' | 'outlined';
-
-  /**
-   * The color to use to display the button.
-   */
-  color?: 'primary' | 'secondary';
-
-  /**
-   * The label used inside the button.
-   */
-  label?: string;
+interface EditVariablesButtonProps extends Pick<ButtonProps, 'fullWidth' | 'startIcon' | 'variant' | 'color'> {
+  label: string;
+  variableDefinitions: VariableDefinition[];
+  onChange: (variableDefinitions: VariableDefinition[]) => void;
+  onCancel: () => void;
 }
 
-export function EditVariablesButton({
-  variant = 'text',
-  label = 'Variables',
-  color = 'primary',
+function EditVariablesButton({
+  label,
+  variableDefinitions,
+  onChange,
+  onCancel,
+  variant,
+  color,
+  startIcon,
   fullWidth,
 }: EditVariablesButtonProps) {
   const [isVariableEditorOpen, setIsVariableEditorOpen] = useState(false);
-  const variableDefinitions: VariableDefinition[] = useTemplateVariableDefinitions();
-  const { setVariableDefinitions } = useTemplateVariableActions();
 
   const openVariableEditor = () => {
     setIsVariableEditorOpen(true);
@@ -56,11 +52,18 @@ export function EditVariablesButton({
     setIsVariableEditorOpen(false);
   };
 
+  const handleCancel = () => {
+    //  TODO: if (onCancel()) {
+    onCancel();
+    closeVariableEditor();
+    // }
+  };
+
   return (
     <>
       <InfoTooltip description={TOOLTIP_TEXT.editVariables}>
         <Button
-          startIcon={<PencilIcon />}
+          startIcon={startIcon}
           onClick={openVariableEditor}
           aria-label={TOOLTIP_TEXT.editVariables}
           variant={variant}
@@ -77,15 +80,96 @@ export function EditVariablesButton({
         PaperProps={{ sx: { width: '50%' } }}
         data-testid="variable-editor"
       >
-        <VariableEditor
-          variableDefinitions={variableDefinitions}
-          onCancel={closeVariableEditor}
-          onChange={(variables: VariableDefinition[]) => {
-            setVariableDefinitions(variables);
-            setIsVariableEditorOpen(false);
-          }}
-        />
+        <VariableEditor variableDefinitions={variableDefinitions} onCancel={handleCancel} onChange={onChange} />
       </Drawer>
     </>
+  );
+}
+
+interface EditDashboardVariablesButtonProps extends Pick<ButtonProps, 'fullWidth' | 'startIcon' | 'variant' | 'color'> {
+  label?: string;
+}
+
+export function EditDashboardVariablesButton({
+  variant = 'text',
+  label = 'Variables',
+  color = 'primary',
+  startIcon = <PencilIcon />,
+  fullWidth,
+}: EditDashboardVariablesButtonProps) {
+  const variableDefinitions: VariableDefinition[] = useTemplateVariableDefinitions();
+  const [initialVariableDefinitions] = useState(variableDefinitions);
+  const { setVariableDefinitions } = useTemplateVariableActions();
+  const { openDiscardChangesConfirmationDialog, closeDiscardChangesConfirmationDialog } =
+    useDiscardChangesConfirmationDialog();
+
+  const handleCancel = () => {
+    if (JSON.stringify(variableDefinitions) !== JSON.stringify(initialVariableDefinitions)) {
+      openDiscardChangesConfirmationDialog({
+        onDiscardChanges: () => {
+          closeDiscardChangesConfirmationDialog();
+          // TODO: close
+        },
+        onCancel: () => {
+          closeDiscardChangesConfirmationDialog();
+          // TODO: do not close
+        },
+        description:
+          'You have unapplied changes. Are you sure you want to discard these changes? Changes cannot be recovered.',
+      });
+    } else {
+      return false;
+    }
+  };
+
+  return (
+    <EditVariablesButton
+      variableDefinitions={variableDefinitions}
+      onChange={(variables: VariableDefinition[]) => {
+        setVariableDefinitions(variables);
+      }}
+      onCancel={handleCancel}
+      variant={variant}
+      label={label}
+      color={color}
+      startIcon={startIcon}
+      fullWidth={fullWidth}
+    />
+  );
+}
+
+interface EditProjectVariablesButtonProps extends Pick<ButtonProps, 'fullWidth' | 'startIcon' | 'variant' | 'color'> {
+  label?: string;
+}
+
+export function EditProjectVariablesButton({
+  variant = 'text',
+  label = 'Variables',
+  color = 'primary',
+  startIcon = undefined,
+  fullWidth,
+}: EditProjectVariablesButtonProps) {
+  // const variableDefinitions: VariableDefinition[] = useProjectVariableDefinitions();
+  // const { setVariableDefinitions } = useProjectVariableActions();
+
+  const handleChange = (variableDefinitions: VariableDefinition[]) => {
+    console.log(variableDefinitions);
+  };
+
+  const handleCancel = () => {
+    console.log('close');
+  };
+
+  return (
+    <EditVariablesButton
+      variableDefinitions={[]}
+      onChange={handleChange}
+      onCancel={handleCancel}
+      variant={variant}
+      label={label}
+      color={color}
+      startIcon={startIcon}
+      fullWidth={fullWidth}
+    />
   );
 }
