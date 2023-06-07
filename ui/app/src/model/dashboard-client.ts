@@ -31,7 +31,7 @@ export function useCreateDashboardMutation(
   const queryClient = useQueryClient();
 
   return useMutation<DashboardResource, Error, DashboardResource>({
-    mutationKey: [resource],
+    mutationKey: [resource], // TODO: improve all dashboard mutation keys with project key
     mutationFn: (dashboard) => {
       return createDashboard(dashboard);
     },

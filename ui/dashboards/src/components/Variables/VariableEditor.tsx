@@ -60,6 +60,7 @@ function getValidation(variableDefinitions: VariableDefinition[]) {
 export function VariableEditor(props: {
   variableDefinitions: VariableDefinition[];
   onChange: (variableDefinitions: VariableDefinition[]) => void;
+  onSubmit: (variableDefinitions: VariableDefinition[]) => void;
   onCancel: () => void;
 }) {
   const [variableDefinitions, setVariableDefinitions] = useImmer(props.variableDefinitions);
@@ -72,6 +73,7 @@ export function VariableEditor(props: {
     setVariableDefinitions((draft) => {
       draft.splice(index, 1);
     });
+    props.onChange(variableDefinitions);
   };
 
   const addVariable = () => {
@@ -85,6 +87,7 @@ export function VariableEditor(props: {
       });
     });
     setVariableEditIdx(variableDefinitions.length);
+    props.onChange(variableDefinitions);
   };
 
   const toggleVariableVisibility = (index: number, visible: boolean) => {
@@ -101,6 +104,7 @@ export function VariableEditor(props: {
       }
       v.spec.display.hidden = visible === false;
     });
+    props.onChange(variableDefinitions);
   };
 
   const changeVariableOrder = (index: number, direction: 'up' | 'down') => {
@@ -123,6 +127,7 @@ export function VariableEditor(props: {
         draft[index] = nextElement;
       }
     });
+    props.onChange(variableDefinitions);
   };
 
   return (
@@ -135,6 +140,7 @@ export function VariableEditor(props: {
               draft[variableEditIdx] = definition;
               setVariableEditIdx(null);
             });
+            props.onChange(variableDefinitions);
           }}
           onCancel={() => setVariableEditIdx(null)}
         />
@@ -155,7 +161,7 @@ export function VariableEditor(props: {
                 disabled={props.variableDefinitions === variableDefinitions || !validation.isValid}
                 variant="contained"
                 onClick={() => {
-                  props.onChange(variableDefinitions);
+                  props.onSubmit(variableDefinitions);
                 }}
               >
                 Apply

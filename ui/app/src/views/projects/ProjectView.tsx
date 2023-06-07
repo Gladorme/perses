@@ -14,16 +14,17 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Stack, Typography, Grid } from '@mui/material';
 import FolderPound from 'mdi-material-ui/FolderPound';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DatasourceStoreProvider, EditProjectVariablesButton } from '@perses-dev/dashboards';
-import { VariableDefinition } from '@perses-dev/core';
-import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
+import { VariableDefinition, VariableResource } from '@perses-dev/core';
+import { ErrorAlert, ErrorBoundary, useSnackbar } from '@perses-dev/components';
 import { PluginRegistry } from '@perses-dev/plugin-system';
 import { DeleteProjectDialog } from '../../components/DeleteProjectDialog/DeleteProjectDialog';
 import DashboardBreadcrumbs from '../../components/DashboardBreadcrumbs';
 import { CRUDButton } from '../../components/CRUDButton/CRUDButton';
 import { bundledPluginLoader } from '../../model/bundled-plugins';
 import { CachedDatasourceAPI, HTTPDatasourceAPI } from '../../model/datasource-api';
+import { useSaveVariablesMutation, useVariableList } from '../../model/project-client';
 import { RecentlyViewedDashboards } from './RecentlyViewedDashboards';
 import { ProjectDashboards } from './ProjectDashboards';
 
@@ -35,6 +36,8 @@ function ProjectView() {
 
   // Navigate to the home page if the project has been successfully deleted
   const navigate = useNavigate();
+  const { successSnackbar, exceptionSnackbar } = useSnackbar();
+
   const handleDeleteProjectDialogSuccess = useCallback(() => navigate(`/`), [navigate]);
 
   const [datasourceApi] = useState(() => new CachedDatasourceAPI(new HTTPDatasourceAPI()));
@@ -46,14 +49,57 @@ function ProjectView() {
 
   // Open/Close management for the "Delete Project" dialog
   const [isDeleteProjectDialogOpen, setIsDeleteProjectDialogOpen] = useState<boolean>(false);
-  const handleDeleteProjectDialogOpen = useCallback(
-    () => setIsDeleteProjectDialogOpen(true),
-    [setIsDeleteProjectDialogOpen]
-  );
-  const handleDeleteProjectDialogClose = useCallback(
-    () => setIsDeleteProjectDialogOpen(false),
-    [setIsDeleteProjectDialogOpen]
-  );
+
+  const { data } = useVariableList(projectName);
+  const saveVariablesMutation = useSaveVariablesMutation(projectName, data ?? []);
+
+  const variableDefinitions = useMemo(() => {
+    const result: VariableDefinition[] = [];
+
+    for (const variable of data ?? []) {
+      result.push({
+        ...variable.spec,
+        ...{
+          spec: { name: variable.metadata.name },
+        },
+      } as VariableDefinition);
+    }
+
+    return result;
+  }, [data]);
+
+  const handleVariablesSave = (variableDefinitions: VariableDefinition[]) => {
+    console.log('handleVariablesSave - variableDefinitions');
+    console.log(variableDefinitions);
+    // TODO: transform definition in resource
+    const variableResources: VariableResource[] = [];
+
+    for (const variableDef of variableDefinitions) {
+      variableResources.push({
+        kind: 'Variable',
+        metadata: {
+          name: variableDef.spec.name,
+          project: projectName,
+        },
+        spec: variableDef,
+      });
+    }
+
+    console.log('handleVariablesSave - variableResources');
+    console.log(variableResources);
+
+    saveVariablesMutation.mutate(variableResources, {
+      onSuccess: (updatedVariables: VariableResource[]) => {
+        successSnackbar(`Variables have been successfully updated`);
+        console.log('handleVariablesSave - updatedVariables');
+        console.log(updatedVariables);
+      },
+      onError: (err) => {
+        exceptionSnackbar(err);
+        throw err;
+      },
+    });
+  };
 
   return (
     <Stack sx={{ width: '100%' }} m={2} gap={2}>
@@ -74,21 +120,26 @@ function ProjectView() {
                 }}
               >
                 <DatasourceStoreProvider datasourceApi={datasourceApi} projectName={projectName}>
-                  <EditProjectVariablesButton variant="contained" />
+                  <EditProjectVariablesButton
+                    variant="contained"
+                    variableDefinitions={variableDefinitions}
+                    onSave={handleVariablesSave}
+                  />
                 </DatasourceStoreProvider>
               </PluginRegistry>
             </ErrorBoundary>
+
             <CRUDButton
               text="Delete Project"
               variant="outlined"
               color="error"
-              onClick={handleDeleteProjectDialogOpen}
+              onClick={() => setIsDeleteProjectDialogOpen(true)}
             />
           </Stack>
           <DeleteProjectDialog
             name={projectName}
             open={isDeleteProjectDialogOpen}
-            onClose={handleDeleteProjectDialogClose}
+            onClose={() => setIsDeleteProjectDialogOpen(false)}
             onSuccess={handleDeleteProjectDialogSuccess}
           />
         </Stack>

@@ -16,9 +16,9 @@ import { Button, ButtonProps } from '@mui/material';
 import PencilIcon from 'mdi-material-ui/PencilOutline';
 import { Drawer, InfoTooltip } from '@perses-dev/components';
 import { VariableDefinition } from '@perses-dev/core';
-import { VariableBox } from 'mdi-material-ui';
 import { TOOLTIP_TEXT } from '../../constants';
 import {
+  DiscardChangesConfirmationDialogState,
   useDiscardChangesConfirmationDialog,
   useTemplateVariableActions,
   useTemplateVariableDefinitions,
@@ -29,13 +29,15 @@ interface EditVariablesButtonProps extends Pick<ButtonProps, 'fullWidth' | 'star
   label: string;
   variableDefinitions: VariableDefinition[];
   onChange: (variableDefinitions: VariableDefinition[]) => void;
-  onCancel: () => void;
+  onSubmit: (variableDefinitions: VariableDefinition[]) => void;
+  onCancel: () => Promise<boolean>;
 }
 
 function EditVariablesButton({
   label,
   variableDefinitions,
   onChange,
+  onSubmit,
   onCancel,
   variant,
   color,
@@ -53,10 +55,12 @@ function EditVariablesButton({
   };
 
   const handleCancel = () => {
-    //  TODO: if (onCancel()) {
-    onCancel();
-    closeVariableEditor();
-    // }
+    onCancel().then((confirm) => {
+      if (confirm) {
+        closeVariableEditor();
+        onChange(variableDefinitions);
+      }
+    });
   };
 
   return (
@@ -80,10 +84,42 @@ function EditVariablesButton({
         PaperProps={{ sx: { width: '50%' } }}
         data-testid="variable-editor"
       >
-        <VariableEditor variableDefinitions={variableDefinitions} onCancel={handleCancel} onChange={onChange} />
+        <VariableEditor
+          variableDefinitions={variableDefinitions}
+          onCancel={handleCancel}
+          onChange={onChange}
+          onSubmit={onSubmit}
+        />
       </Drawer>
     </>
   );
+}
+
+/**
+ * Open a confirmation modal, promise returns true if the discard is validated else returns false
+ * @param openDiscardChangesConfirmationDialog
+ * @param closeDiscardChangesConfirmationDialog
+ */
+function getDiscardConfirmation(
+  openDiscardChangesConfirmationDialog: (
+    discardChangesConfirmationDialog: DiscardChangesConfirmationDialogState
+  ) => void,
+  closeDiscardChangesConfirmationDialog: () => void
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    openDiscardChangesConfirmationDialog({
+      onDiscardChanges: () => {
+        closeDiscardChangesConfirmationDialog();
+        resolve(true);
+      },
+      onCancel: () => {
+        closeDiscardChangesConfirmationDialog();
+        resolve(false);
+      },
+      description:
+        'You have unapplied changes. Are you sure you want to discard these changes? Changes cannot be recovered.',
+    });
+  });
 }
 
 interface EditDashboardVariablesButtonProps extends Pick<ButtonProps, 'fullWidth' | 'startIcon' | 'variant' | 'color'> {
@@ -98,34 +134,25 @@ export function EditDashboardVariablesButton({
   fullWidth,
 }: EditDashboardVariablesButtonProps) {
   const variableDefinitions: VariableDefinition[] = useTemplateVariableDefinitions();
-  const [initialVariableDefinitions] = useState(variableDefinitions);
+  const [transientVariableDefinitions, setTransientVariableDefinitions] = useState(variableDefinitions);
   const { setVariableDefinitions } = useTemplateVariableActions();
   const { openDiscardChangesConfirmationDialog, closeDiscardChangesConfirmationDialog } =
     useDiscardChangesConfirmationDialog();
 
   const handleCancel = () => {
-    if (JSON.stringify(variableDefinitions) !== JSON.stringify(initialVariableDefinitions)) {
-      openDiscardChangesConfirmationDialog({
-        onDiscardChanges: () => {
-          closeDiscardChangesConfirmationDialog();
-          // TODO: close
-        },
-        onCancel: () => {
-          closeDiscardChangesConfirmationDialog();
-          // TODO: do not close
-        },
-        description:
-          'You have unapplied changes. Are you sure you want to discard these changes? Changes cannot be recovered.',
-      });
-    } else {
-      return false;
+    if (JSON.stringify(variableDefinitions) !== JSON.stringify(transientVariableDefinitions)) {
+      return getDiscardConfirmation(openDiscardChangesConfirmationDialog, closeDiscardChangesConfirmationDialog);
     }
+    return Promise.resolve(true);
   };
 
   return (
     <EditVariablesButton
       variableDefinitions={variableDefinitions}
       onChange={(variables: VariableDefinition[]) => {
+        setTransientVariableDefinitions(variables);
+      }}
+      onSubmit={(variables: VariableDefinition[]) => {
         setVariableDefinitions(variables);
       }}
       onCancel={handleCancel}
@@ -140,6 +167,8 @@ export function EditDashboardVariablesButton({
 
 interface EditProjectVariablesButtonProps extends Pick<ButtonProps, 'fullWidth' | 'startIcon' | 'variant' | 'color'> {
   label?: string;
+  variableDefinitions: VariableDefinition[];
+  onSave: (variablesDefinitions: VariableDefinition[]) => void; // TODO: maybe promise in order to revert to old var?
 }
 
 export function EditProjectVariablesButton({
@@ -148,22 +177,26 @@ export function EditProjectVariablesButton({
   color = 'primary',
   startIcon = undefined,
   fullWidth,
+  variableDefinitions,
+  onSave,
 }: EditProjectVariablesButtonProps) {
-  // const variableDefinitions: VariableDefinition[] = useProjectVariableDefinitions();
-  // const { setVariableDefinitions } = useProjectVariableActions();
-
-  const handleChange = (variableDefinitions: VariableDefinition[]) => {
-    console.log(variableDefinitions);
-  };
+  const [transientVariableDefinitions, setTransientVariableDefinitions] = useState(variableDefinitions);
 
   const handleCancel = () => {
-    console.log('close');
+    if (JSON.stringify(variableDefinitions) !== JSON.stringify(transientVariableDefinitions)) {
+      // TODO: return getDiscardConfirmation(openDiscardChangesConfirmationDialog, closeDiscardChangesConfirmationDialog);
+      return Promise.resolve(true);
+    }
+    return Promise.resolve(true);
   };
 
   return (
     <EditVariablesButton
-      variableDefinitions={[]}
-      onChange={handleChange}
+      variableDefinitions={variableDefinitions}
+      onChange={(variables: VariableDefinition[]) => {
+        setTransientVariableDefinitions(variables);
+      }}
+      onSubmit={onSave}
       onCancel={handleCancel}
       variant={variant}
       label={label}
