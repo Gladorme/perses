@@ -15,6 +15,7 @@ package api
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/perses/perses/pkg/client/perseshttp"
 	"github.com/perses/perses/pkg/model/api"
@@ -22,8 +23,25 @@ import (
 
 const authResource = "auth"
 
+type DeviceCodeResponse struct {
+	DeviceCode      string `json:"device_code"`
+	UserCode        string `json:"user_code"`
+	VerificationURL string `json:"verification_uri"`
+	ExpiresIn       int    `json:"expires_in"`
+	Interval        int    `json:"interval"`
+}
+
+type TokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int    `json:"expires_in"`
+}
+
 // AuthInterface has methods to work with Auth resource
 type AuthInterface interface {
+	StartDeviceCodeFlow(authKind, authProvider, clientID string) (*DeviceCodeResponse, error)
+	PollDeviceCodeFlow(authKind, slugID, clientID, deviceCode string) (*TokenResponse, error)
 	Login(user, password string) (*api.AuthResponse, error)
 	Refresh(refreshToken string) (*api.AuthResponse, error)
 }
@@ -63,4 +81,32 @@ func (c *auth) Refresh(refreshToken string) (*api.AuthResponse, error) {
 		Body(body).
 		Do().
 		Object(result)
+}
+
+func (c *auth) StartDeviceCodeFlow(authKind, slugID, clientID string) (*DeviceCodeResponse, error) {
+	result := &DeviceCodeResponse{}
+
+	err := c.client.Post().
+		APIVersion("").
+		Resource(fmt.Sprintf("%s/providers/%s/%s/device/code", authResource, authKind, slugID)).
+		Body(url.Values{"client_id": {clientID}, "scope": {"profile"}}).
+		Do().
+		Object(result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (c *auth) PollDeviceCodeFlow(authKind, slugID, clientID, deviceCode string) (*TokenResponse, error) {
+	result := &TokenResponse{}
+	err := c.client.Post().
+		APIVersion("").
+		Resource(fmt.Sprintf("%s/providers/%s/%s/token", authResource, authKind, slugID)).
+		Body(map[string]string{"client_id": clientID, "device_code": deviceCode}).
+		Do().
+		Object(result)
+	return result, err
 }

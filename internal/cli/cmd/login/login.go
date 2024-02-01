@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"time"
 
 	"github.com/charmbracelet/huh"
 	"github.com/perses/perses/internal/api/utils"
@@ -45,6 +46,7 @@ type option struct {
 	password             string
 	externalAuthKind     externalAuthKind
 	externalAuthProvider string
+	externalAuthClientID string
 	accessToken          string
 	refreshToken         string
 	insecureTLS          bool
@@ -125,10 +127,31 @@ func (o *option) authAndSetToken() error {
 		return nil
 	}
 
-	// TODO: Use o.externalAuthKind and o.externalAuthProvider to start a device code flow
-	//   (e.g first calling the api/auth/providers/{oidc|oauth}/{externalAuthProvider}/device/code)
-	//   Design in Authentication.md design documentation
-	return errors.New("oidc and oauth 2.0 authentication are not yet supported through command line")
+	// Start the device code flow
+	deviceCodeResponse, err := o.apiClient.Auth().StartDeviceCodeFlow(string(o.externalAuthKind), o.externalAuthProvider, o.externalAuthClientID)
+	if err != nil {
+		return err
+	}
+
+	// Display the user code and verification URL
+	fmt.Printf("Go to %s and enter this user code: %s\n", deviceCodeResponse.VerificationURL, deviceCodeResponse.UserCode)
+
+	// Poll for an access token
+	for {
+		time.Sleep(time.Duration(deviceCodeResponse.Interval) * time.Second)
+
+		tokenResponse, err := o.apiClient.Auth().PollDeviceCodeFlow(string(o.externalAuthKind), o.externalAuthProvider, o.externalAuthClientID, deviceCodeResponse.DeviceCode)
+		if err != nil {
+			fmt.Println("Waiting for user to authorize the application...")
+			continue
+		}
+
+		// Handle the access token
+		o.accessToken = tokenResponse.AccessToken
+		o.refreshToken = tokenResponse.RefreshToken
+		break
+	}
+	return nil
 }
 
 func (o *option) readAndSetLoginInputNative() error {
@@ -231,7 +254,7 @@ func (o *option) readAndSetLoginInput(providers backendConfig.AuthProviders) err
 		optKey := fmt.Sprintf("OIDC (%s)", prov.Name)
 		optValue := prov.SlugID
 		options = append(options, huh.NewOption(optKey, optValue))
-		modifiers[optValue] = o.setLoginInputExternal(externalAuthKindOAuth, prov.SlugID)
+		modifiers[optValue] = o.setLoginInputExternal(externalAuthKindOIDC, prov.SlugID)
 	}
 
 	// Saving OAuth 2.0 item(s) if supported

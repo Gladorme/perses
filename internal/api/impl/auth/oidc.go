@@ -30,6 +30,7 @@ import (
 	"github.com/perses/perses/pkg/model/api/config"
 	v1 "github.com/perses/perses/pkg/model/api/v1"
 	"github.com/sirupsen/logrus"
+	"github.com/zitadel/oidc/v3/pkg/client"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	httphelper "github.com/zitadel/oidc/v3/pkg/http"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -68,8 +69,16 @@ func (u *oidcUserInfo) GetProviderContext() v1.OAuthProvider {
 	}
 }
 
+type RelyingPartyWithTokenEndpoint struct {
+	rp.RelyingParty
+}
+
+func (r RelyingPartyWithTokenEndpoint) TokenEndpoint() string {
+	return r.OAuthConfig().Endpoint.TokenURL
+}
+
 type oIDCEndpoint struct {
-	relyingParty    rp.RelyingParty
+	relyingParty    RelyingPartyWithTokenEndpoint
 	jwt             crypto.JWT
 	tokenManagement tokenManagement
 	slugID          string
@@ -115,7 +124,7 @@ func newOIDCEndpoint(provider config.OIDCProvider, jwt crypto.JWT, dao user.DAO)
 		return nil, err
 	}
 	return &oIDCEndpoint{
-		relyingParty:    relyingParty,
+		relyingParty:    RelyingPartyWithTokenEndpoint{relyingParty},
 		jwt:             jwt,
 		tokenManagement: tokenManagement{jwt: jwt},
 		slugID:          provider.SlugID,
@@ -128,6 +137,10 @@ func newOIDCEndpoint(provider config.OIDCProvider, jwt crypto.JWT, dao user.DAO)
 func (e *oIDCEndpoint) CollectRoutes(g *route.Group) {
 	g.GET(fmt.Sprintf("/%s/%s/%s", utils.AuthKindOIDC, e.slugID, utils.PathLogin), e.buildAuthHandler(), true)
 	g.GET(fmt.Sprintf("/%s/%s/%s", utils.AuthKindOIDC, e.slugID, utils.PathCallback), e.buildCodeExchangeHandler(), true)
+
+	// Add new routes for device code flow and token exchange
+	g.POST(fmt.Sprintf("/%s/%s/device/code", utils.AuthKindOIDC, e.slugID), e.handleDeviceCode, true)
+	g.POST(fmt.Sprintf("/%s/%s/token", utils.AuthKindOIDC, e.slugID), e.handleToken, true)
 }
 
 func (e *oIDCEndpoint) buildAuthHandler() echo.HandlerFunc {
@@ -147,6 +160,79 @@ func (e *oIDCEndpoint) buildAuthHandler() echo.HandlerFunc {
 		handler := echo.WrapHandler(codeExchangeHandler)
 		return handler(ctx)
 	}
+}
+
+func (e *oIDCEndpoint) handleDeviceCode(ctx echo.Context) error {
+	// Send the device authorization request
+	resp, err := client.CallDeviceAuthorizationEndpoint(ctx.Request().Context(), &oidc.ClientCredentialsRequest{
+		Scope:        e.relyingParty.OAuthConfig().Scopes,
+		ClientID:     e.relyingParty.OAuthConfig().ClientID,
+		ClientSecret: e.relyingParty.OAuthConfig().ClientSecret,
+	}, e.relyingParty, "")
+	if err != nil {
+		logrus.WithError(err).Error("Failed to send device authorization request")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to send device authorization request")
+	}
+
+	// Return the device authorization response
+	return ctx.JSON(http.StatusOK, resp)
+}
+
+func (e *oIDCEndpoint) handleToken(ctx echo.Context) error {
+	// Parse the request body to get the device code
+	var reqBody struct {
+		DeviceCode string `json:"device_code"`
+	}
+	if err := ctx.Bind(&reqBody); err != nil {
+		e.logWithError(err).Error("Invalid request body")
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body")
+	}
+
+	// Create a new device access token request
+	req := &client.DeviceAccessTokenRequest{
+		DeviceAccessTokenRequest: oidc.DeviceAccessTokenRequest{
+			GrantType:  oidc.GrantTypeDeviceCode,
+			DeviceCode: reqBody.DeviceCode,
+		},
+	}
+
+	// Create a new device access token request
+	var err error
+	req.ClientCredentialsRequest, err = newDeviceClientCredentialsRequest(e.relyingParty.OAuthConfig().Scopes, e.relyingParty)
+	if err != nil {
+		e.logWithError(err).Error("Failed to prepare token request")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to prepare token request")
+	}
+
+	// Call the device access token endpoint
+	resp, err := client.CallDeviceAccessTokenEndpoint(ctx.Request().Context(), req, e.relyingParty)
+	if err != nil {
+		e.logWithError(err).Error("Failed to send token request")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to send token request")
+	}
+
+	// Return the token response
+	return ctx.JSON(http.StatusOK, resp)
+}
+
+func newDeviceClientCredentialsRequest(scopes []string, rp rp.RelyingParty) (*oidc.ClientCredentialsRequest, error) {
+	confg := rp.OAuthConfig()
+	req := &oidc.ClientCredentialsRequest{
+		Scope:        scopes,
+		ClientID:     confg.ClientID,
+		ClientSecret: confg.ClientSecret,
+	}
+
+	if signer := rp.Signer(); signer != nil {
+		assertion, err := client.SignedJWTProfileAssertion(rp.OAuthConfig().ClientID, []string{rp.Issuer()}, time.Hour, signer)
+		if err != nil {
+			return nil, fmt.Errorf("failed to build assertion: %w", err)
+		}
+		req.ClientAssertion = assertion
+		req.ClientAssertionType = oidc.ClientAssertionTypeJWTAssertion
+	}
+
+	return req, nil
 }
 
 func (e *oIDCEndpoint) buildCodeExchangeHandler() echo.HandlerFunc {
