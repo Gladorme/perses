@@ -14,7 +14,21 @@ security:
           - Project
   authentication:
     providers:
-      enable_native: true
+      enable_native: false
+      oidc:
+        - slug_id: "azure"
+          name: "Azure AD"
+          client_id: "91818500-e2d9-49a5-8e33-f7e942992f56"
+          client_secret: "XfZ8Q~hDcEr3r5bzpXQRH4-Lrjaupc3L.LFmKbZP"
+          scopes:
+            - "openid"
+            - "profile"
+            - "email"
+            - "User.read"
+          issuer: "https://login.microsoftonline.com/7d7761c0-8b7a-49bb-8975-a6aa1be7c38b/v2.0"
+          url_params:
+            domain_hint: "msp.amadeus.net"
+
 
 database:
   file:

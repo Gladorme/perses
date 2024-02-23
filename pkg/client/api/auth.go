@@ -15,13 +15,17 @@ package api
 
 import (
 	"fmt"
-	"net/url"
 
 	"github.com/perses/perses/pkg/client/perseshttp"
 	"github.com/perses/perses/pkg/model/api"
 )
 
 const authResource = "auth"
+
+type DeviceCodePayload struct {
+	ClientID string   `json:"client_id"`
+	Scope    []string `json:"scope"`
+}
 
 type DeviceCodeResponse struct {
 	DeviceCode      string `json:"device_code"`
@@ -84,12 +88,13 @@ func (c *auth) Refresh(refreshToken string) (*api.AuthResponse, error) {
 }
 
 func (c *auth) StartDeviceCodeFlow(authKind, slugID, clientID string) (*DeviceCodeResponse, error) {
+	body := &DeviceCodePayload{ClientID: clientID, Scope: []string{"profile"}}
 	result := &DeviceCodeResponse{}
 
 	err := c.client.Post().
 		APIVersion("").
 		Resource(fmt.Sprintf("%s/providers/%s/%s/device/code", authResource, authKind, slugID)).
-		Body(url.Values{"client_id": {clientID}, "scope": {"profile"}}).
+		Body(body).
 		Do().
 		Object(result)
 

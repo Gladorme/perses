@@ -42,7 +42,7 @@ func appendIfMissing[T comparable](slice []T, value T) ([]T, bool) {
 type Provider struct {
 	SlugID       string        `json:"slug_id" yaml:"slug_id"`
 	Name         string        `json:"name" yaml:"name"`
-	ClientID     secret.Hidden `json:"client_id" yaml:"client_id"`
+	ClientID     string        `json:"client_id" yaml:"client_id"`
 	ClientSecret secret.Hidden `json:"client_secret" yaml:"client_secret"`
 	RedirectURI  common.URL    `json:"redirect_uri" yaml:"redirect_uri"`
 	Scopes       []string      `json:"scopes" yaml:"scopes"`

@@ -127,6 +127,9 @@ func (o *option) authAndSetToken() error {
 		return nil
 	}
 
+	if len(o.externalAuthClientID) == 0 {
+		return fmt.Errorf("external authentication client ID is mandatory for device code flow")
+	}
 	// Start the device code flow
 	deviceCodeResponse, err := o.apiClient.Auth().StartDeviceCodeFlow(string(o.externalAuthKind), o.externalAuthProvider, o.externalAuthClientID)
 	if err != nil {
@@ -296,7 +299,8 @@ percli login https://perses.dev
 	cmd.Flags().BoolVar(&o.insecureTLS, "insecure-skip-tls-verify", o.insecureTLS, "If true the server's certificate will not be checked for validity. This will make your HTTPS connections insecure.")
 	cmd.Flags().StringVarP(&o.username, "username", "u", "", "Username used for the authentication.")
 	cmd.Flags().StringVarP(&o.password, "password", "p", "", "Password used for the authentication.")
-	cmd.Flags().StringVar(&o.accessToken, "token", "", "Bearer token for authentication to the API server")
-	cmd.Flags().StringVar(&o.externalAuthProvider, "provider", "", "External authentication provider identifier. (slug_id)")
+	cmd.Flags().StringVar(&o.accessToken, "token", "", "Bearer token for authentication to the API server.")
+	cmd.Flags().StringVar(&o.externalAuthProvider, "provider", "", "External authentication provider identifier (slug_id).")
+	cmd.Flags().StringVar(&o.externalAuthClientID, "client-id", "", "External authentication client ID for device code flow.")
 	return cmd
 }

@@ -182,6 +182,7 @@ func (e *oIDCEndpoint) handleToken(ctx echo.Context) error {
 	// Parse the request body to get the device code
 	var reqBody struct {
 		DeviceCode string `json:"device_code"`
+		ClientID   string `json:"client_id"`
 	}
 	if err := ctx.Bind(&reqBody); err != nil {
 		e.logWithError(err).Error("Invalid request body")

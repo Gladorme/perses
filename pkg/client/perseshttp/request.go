@@ -245,7 +245,7 @@ func (r *Request) buildPath() (string, error) {
 	var path strings.Builder
 
 	// API name
-	if len(r.apiPrefix) <= 0 {
+	if len(r.apiPrefix) == 0 {
 		return "", errors.New("api prefix cannot be empty")
 	}
 	path.WriteString(r.apiPrefix)
@@ -262,7 +262,7 @@ func (r *Request) buildPath() (string, error) {
 	}
 
 	// Resource type (mandatory)
-	if len(r.resource) <= 0 {
+	if len(r.resource) == 0 {
 		return "", errors.New("resource cannot be empty")
 	}
 	path.WriteString(fmt.Sprintf("/%s", r.resource))

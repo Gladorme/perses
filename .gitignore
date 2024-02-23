@@ -35,3 +35,4 @@ dev/local_db
 .goreleaser.yaml
 
 /.github/perses-ci/
+*.ignore.*
