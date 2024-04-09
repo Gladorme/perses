@@ -27,6 +27,7 @@ import (
 	globalSecretImpl "github.com/perses/perses/internal/api/impl/v1/globalsecret"
 	globalVariableImpl "github.com/perses/perses/internal/api/impl/v1/globalvariable"
 	healthImpl "github.com/perses/perses/internal/api/impl/v1/health"
+	pluginImpl "github.com/perses/perses/internal/api/impl/v1/plugin"
 	projectImpl "github.com/perses/perses/internal/api/impl/v1/project"
 	roleImpl "github.com/perses/perses/internal/api/impl/v1/role"
 	roleBindingImpl "github.com/perses/perses/internal/api/impl/v1/rolebinding"
@@ -43,6 +44,7 @@ import (
 	"github.com/perses/perses/internal/api/interface/v1/globalsecret"
 	"github.com/perses/perses/internal/api/interface/v1/globalvariable"
 	"github.com/perses/perses/internal/api/interface/v1/health"
+	"github.com/perses/perses/internal/api/interface/v1/plugin"
 	"github.com/perses/perses/internal/api/interface/v1/project"
 	"github.com/perses/perses/internal/api/interface/v1/role"
 	"github.com/perses/perses/internal/api/interface/v1/rolebinding"
@@ -67,6 +69,7 @@ type ServiceManager interface {
 	GetGlobalSecret() globalsecret.Service
 	GetGlobalVariable() globalvariable.Service
 	GetHealth() health.Service
+	GetPlugin() plugin.Service
 	GetJWT() crypto.JWT
 	GetMigration() migrate.Migration
 	GetProject() project.Service
@@ -92,6 +95,7 @@ type service struct {
 	globalSecret       globalsecret.Service
 	globalVariable     globalvariable.Service
 	health             health.Service
+	plugin             plugin.Service
 	jwt                crypto.JWT
 	migrate            migrate.Migration
 	project            project.Service
@@ -132,6 +136,7 @@ func NewServiceManager(dao PersistenceManager, conf config.Config) (ServiceManag
 	globalSecret := globalSecretImpl.NewService(dao.GetGlobalSecret(), cryptoService)
 	globalVariableService := globalVariableImpl.NewService(dao.GetGlobalVariable(), schemasService)
 	healthService := healthImpl.NewService(dao.GetHealth())
+	pluginService := pluginImpl.NewService()
 	projectService := projectImpl.NewService(dao.GetProject(), dao.GetFolder(), dao.GetDatasource(), dao.GetDashboard(), dao.GetRole(), dao.GetRoleBinding(), dao.GetSecret(), dao.GetVariable(), rbacService)
 	roleService := roleImpl.NewService(dao.GetRole(), rbacService, schemasService)
 	roleBindingService := roleBindingImpl.NewService(dao.GetRoleBinding(), dao.GetRole(), dao.GetUser(), rbacService, schemasService)
@@ -150,6 +155,7 @@ func NewServiceManager(dao PersistenceManager, conf config.Config) (ServiceManag
 		globalSecret:       globalSecret,
 		globalVariable:     globalVariableService,
 		health:             healthService,
+		plugin:             pluginService,
 		jwt:                jwtService,
 		migrate:            migrateService,
 		project:            projectService,
@@ -206,6 +212,10 @@ func (s *service) GetGlobalVariable() globalvariable.Service {
 
 func (s *service) GetHealth() health.Service {
 	return s.health
+}
+
+func (s *service) GetPlugin() plugin.Service {
+	return s.plugin
 }
 
 func (s *service) GetJWT() crypto.JWT {

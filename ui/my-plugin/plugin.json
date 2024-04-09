@@ -1,0 +1,23 @@
+[
+  {
+    "kind": "PluginModule",
+    "metadata": {
+      "name": "Prometheus",
+      "createdAt": "0001-01-01T00:00:00Z",
+      "updatedAt": "0001-01-01T00:00:00Z",
+      "version": 0
+    },
+    "spec": {
+      "plugins": [
+        {
+          "pluginType": "Variable",
+          "kind": "MyVariable",
+          "display": {
+            "name": "Coucou"
+          }
+        }
+      ],
+      "import": "@test/my-plugin"
+    }
+  }
+]

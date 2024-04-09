@@ -15,6 +15,9 @@ import panelsResource from '@perses-dev/panels-plugin/plugin.json';
 import tempoResource from '@perses-dev/tempo-plugin/plugin.json';
 
 import { PluginLoader, PluginModuleResource, dynamicImportPluginLoader } from '@perses-dev/plugin-system';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { lazy } from 'react';
+import { fetchJson } from './fetch';
 
 /**
  * A PluginLoader that includes all the "built-in" plugins that are bundled with Perses by default.
@@ -33,3 +36,20 @@ export const bundledPluginLoader: PluginLoader = dynamicImportPluginLoader([
     importPlugin: () => import('@perses-dev/tempo-plugin'),
   },
 ]);
+
+export async function automaticBundledPluginLoader(): Promise<PluginLoader> {
+  const plugins = await fetchJson<PluginModuleResource[]>('/api/v1/plugins');
+  const result = [];
+  for (const plugin of plugins) {
+    console.log(plugin.spec.import!);
+    result.push({
+      resource: plugin,
+      importPlugin: () => import(`${plugin.spec.import!}`),
+    });
+  }
+  return dynamicImportPluginLoader(result);
+}
+
+export function useBundledPlugins(): UseQueryResult<PluginLoader> {
+  return useQuery(['bundledPlugins'], automaticBundledPluginLoader);
+}

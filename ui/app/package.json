@@ -27,6 +27,7 @@
     "@perses-dev/plugin-system": "0.44.0",
     "@perses-dev/prometheus-plugin": "0.44.0",
     "@perses-dev/tempo-plugin": "0.44.0",
+    "@test/my-plugin": "0.44.0",
     "@tanstack/react-query": "^4.7.1",
     "date-fns": "^2.29.3",
     "immer": "^9.0.15",

@@ -21,7 +21,7 @@ import {
   VariableEditorForm,
   useInitialTimeRange,
 } from '@perses-dev/plugin-system';
-import { bundledPluginLoader } from '../../model/bundled-plugins';
+import { bundledPluginLoader, useBundledPlugins } from '../../model/bundled-plugins';
 import { CachedDatasourceAPI, HTTPDatasourceAPI } from '../../model/datasource-api';
 import { DrawerProps } from '../drawer';
 import { DeleteResourceDialog } from '../dialogs';
@@ -58,6 +58,8 @@ export function VariableDrawer<T extends Variable>(props: VariableDrawerProps<T>
 
   const initialTimeRange = useInitialTimeRange('1h');
 
+  const { data: plugins } = useBundledPlugins();
+
   // Disables closing on click out. This is a quick-win solution to avoid losing draft changes.
   // -> TODO find a way to enable closing by clicking-out in edit view, with a discard confirmation modal popping up
   const handleClickOut = () => {
@@ -67,23 +69,27 @@ export function VariableDrawer<T extends Variable>(props: VariableDrawerProps<T>
   return (
     <Drawer isOpen={isOpen} onClose={handleClickOut} data-testid="variable-editor">
       <ErrorBoundary FallbackComponent={ErrorAlert}>
-        <PluginRegistry pluginLoader={bundledPluginLoader}>
-          <DatasourceStoreProvider datasourceApi={datasourceApi} projectName={projectName}>
-            <TimeRangeProviderWithQueryParams initialTimeRange={initialTimeRange}>
-              <TemplateVariableProviderWithQueryParams initialVariableDefinitions={[]}>
-                <VariableEditorForm
-                  initialVariableDefinition={variableDef}
-                  initialAction={action}
-                  isDraft={false}
-                  isReadonly={isReadonly}
-                  onSave={handleSave}
-                  onClose={onClose}
-                  onDelete={onDelete ? () => setDeleteVariableDialogStateOpened(true) : undefined}
-                />
-              </TemplateVariableProviderWithQueryParams>
-            </TimeRangeProviderWithQueryParams>
-          </DatasourceStoreProvider>
-        </PluginRegistry>
+        {plugins === undefined ? (
+          <p>Loading</p>
+        ) : (
+          <PluginRegistry pluginLoader={plugins}>
+            <DatasourceStoreProvider datasourceApi={datasourceApi} projectName={projectName}>
+              <TimeRangeProviderWithQueryParams initialTimeRange={initialTimeRange}>
+                <TemplateVariableProviderWithQueryParams initialVariableDefinitions={[]}>
+                  <VariableEditorForm
+                    initialVariableDefinition={variableDef}
+                    initialAction={action}
+                    isDraft={false}
+                    isReadonly={isReadonly}
+                    onSave={handleSave}
+                    onClose={onClose}
+                    onDelete={onDelete ? () => setDeleteVariableDialogStateOpened(true) : undefined}
+                  />
+                </TemplateVariableProviderWithQueryParams>
+              </TimeRangeProviderWithQueryParams>
+            </DatasourceStoreProvider>
+          </PluginRegistry>
+        )}
         {onDelete && (
           <DeleteResourceDialog
             open={isDeleteVariableDialogStateOpened}

@@ -30,6 +30,7 @@ export interface PluginModuleResource {
 
 export interface PluginSpec {
   plugins: PluginMetadata[];
+  import?: string;
 }
 
 /**
