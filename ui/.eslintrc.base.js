@@ -20,12 +20,9 @@ module.exports = {
     'plugin:jsx-a11y/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
-
-    // Only impacts stories following *.stories.* naming by default.
-    'plugin:storybook/recommended',
   ],
 
-  plugins: ['import'],
+  plugins: ['import', 'eslint-plugin-react-compiler'],
 
   env: {
     commonjs: true,
@@ -52,6 +49,7 @@ module.exports = {
   },
 
   rules: {
+    'react-compiler/react-compiler': 'warn',
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 'error',
 

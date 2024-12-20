@@ -18,6 +18,7 @@ import { Configuration } from 'webpack';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import ESLintWebpackPlugin from 'eslint-webpack-plugin';
 import CircularDependencyPlugin from 'circular-dependency-plugin';
+import { defineReactCompilerLoaderOption, reactCompilerLoader } from 'react-compiler-webpack';
 
 // Use common config for swc
 const swcrc = JSON.parse(fs.readFileSync('../.swcrc', 'utf-8'));
@@ -57,14 +58,47 @@ export const commonConfig: Configuration = {
     rules: [
       {
         test: /\.tsx?$/,
+        exclude: /node_modules/,
         use: [
+          // babel-loader, swc-loader, esbuild-loader, or anything you like to transpile JSX should go here.
+          // If you are using rspack, the rspack's buiilt-in react transformation is sufficient.
+          { loader: 'swc-loader', options: swcrc },
+          // Now add forgetti-loader
           {
-            // Type-checking happens in separate plugin process
-            loader: 'swc-loader',
-            options: swcrc,
+            loader: reactCompilerLoader,
+            options: defineReactCompilerLoaderOption({
+              // React Compiler options goes here
+            }),
           },
         ],
       },
+
+      // {
+      //   test: /\.[mc]?[jt]sx$/i,
+      //   exclude: /node_modules/,
+      //   use: [
+      //     // babel-loader, swc-loader, esbuild-loader, or anything you like to transpile JSX should go here.
+      //     // If you are using rspack, the rspack's buiilt-in react transformation is sufficient.
+      //     { loader: 'swc-loader' },
+      //     // Now add forgetti-loader
+      //     {
+      //       loader: reactCompilerLoader,
+      //       options: defineReactCompilerLoaderOption({
+      //         // React Compiler options goes here
+      //       }),
+      //     },
+      //   ],
+      // },
+      // {
+      //   test: /\.tsx?$/,
+      //   use: [
+      //     {
+      //       // Type-checking happens in separate plugin process
+      //       loader: 'swc-loader',
+      //       options: swcrc,
+      //     },
+      //   ],
+      // },
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
