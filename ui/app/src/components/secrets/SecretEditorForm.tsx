@@ -93,9 +93,10 @@ export function SecretEditorForm({
   // Form errors are removed only from latest input touched
   // This will remove errors for others inputs
   useEffect(() => {
-    form.clearErrors();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.formState.isValid]);
+    if (form.formState.isValid) {
+      form.clearErrors();
+    }
+  }, [form]);
 
   const [tabValue, setTabValue] = useState<string>(
     initialSecretClean.spec.basicAuth ? basicAuthIndex : authorizationIndex

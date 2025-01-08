@@ -45,13 +45,15 @@ export const RenameDashboardDialog = (props: RenameDashboardDialogProps): ReactE
   const updateDashboardMutation = useUpdateDashboardMutation();
 
   const processForm: SubmitHandler<RenameDashboardValidationType> = (data) => {
-    if (dashboard.spec.display) {
-      dashboard.spec.display.name = data.dashboardName;
+    const result: DashboardResource = { ...dashboard };
+
+    if (result.spec.display) {
+      result.spec.display.name = data.dashboardName;
     } else {
-      dashboard.spec.display = { name: data.dashboardName };
+      result.spec.display = { name: data.dashboardName };
     }
 
-    updateDashboardMutation.mutate(dashboard, {
+    updateDashboardMutation.mutate(result, {
       onSuccess: (updatedDashboard: DashboardResource) => {
         successSnackbar(`Dashboard ${getResourceExtendedDisplayName(updatedDashboard)} has been successfully updated`);
         onClose();

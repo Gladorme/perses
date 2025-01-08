@@ -44,6 +44,7 @@ interface UpdateEphemeralDashboardDialog {
  */
 export const UpdateEphemeralDashboardDialog = (props: UpdateEphemeralDashboardDialog): ReactElement => {
   const { ephemeralDashboard, open, onClose, onSuccess } = props;
+
   const form = useForm<UpdateEphemeralDashboardValidationType>({
     resolver: zodResolver(updateEphemeralDashboardDialogValidationSchema),
     mode: 'onBlur',
@@ -56,14 +57,16 @@ export const UpdateEphemeralDashboardDialog = (props: UpdateEphemeralDashboardDi
   const updateEphemeralDashboardMutation = useUpdateEphemeralDashboardMutation();
 
   const processForm: SubmitHandler<UpdateEphemeralDashboardValidationType> = (data) => {
-    if (ephemeralDashboard.spec.display) {
-      ephemeralDashboard.spec.display.name = data.dashboardName;
-    } else {
-      ephemeralDashboard.spec.display = { name: data.dashboardName };
-    }
-    ephemeralDashboard.spec.ttl = data.ttl as DurationString;
+    const result: EphemeralDashboardResource = { ...ephemeralDashboard };
 
-    updateEphemeralDashboardMutation.mutate(ephemeralDashboard, {
+    if (result.spec.display) {
+      result.spec.display.name = data.dashboardName;
+    } else {
+      result.spec.display = { name: data.dashboardName };
+    }
+    result.spec.ttl = data.ttl as DurationString;
+
+    updateEphemeralDashboardMutation.mutate(result, {
       onSuccess: (updatedEphemeralDashboard: EphemeralDashboardResource) => {
         successSnackbar(
           `Ephemeral Dashboard ${getResourceExtendedDisplayName(

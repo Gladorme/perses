@@ -55,12 +55,11 @@ function GrafanaFlow({ dashboard }: GrafanaFlowProps): ReactElement {
 
   // initialize the map with the provided input values if exist
   dashboard?.__inputs?.map((input) => {
-    grafanaInput[input.name] = input.value ?? '';
+    setGrafanaInput((prev) => ({ ...prev, [input.name]: input.value ?? '' }));
   });
 
   const setInput = (key: string, value: string): void => {
-    grafanaInput[key] = value;
-    setGrafanaInput(grafanaInput);
+    setGrafanaInput((prev) => ({ ...prev, [key]: value }));
   };
 
   const importOnClick = (): void => {
