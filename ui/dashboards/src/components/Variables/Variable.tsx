@@ -190,6 +190,7 @@ function ListVariable({ name, source }: VariableProps): ReactElement {
     variablesOptionsQuery
   );
   const [inputWidth, setInputWidth] = useState(MIN_VARIABLE_WIDTH);
+  const [inputValue, setInputValue] = useState('');
 
   const title = definition?.spec.display?.name ?? name;
   const allowMultiple = definition?.spec.allowMultiple === true;
@@ -227,7 +228,7 @@ function ListVariable({ name, source }: VariableProps): ReactElement {
         slots={{ popper: StyledPopper }}
         renderInput={(params) => {
           return allowMultiple ? (
-            <TextField {...params} label={title} />
+            <TextField {...params} label={title} onChange={(e) => setInputValue(e.target.value)} />
           ) : (
             <TextField {...params} label={title} style={{ width: `${inputWidth}px` }} />
           );
@@ -248,10 +249,14 @@ function ListVariable({ name, source }: VariableProps): ReactElement {
             setVariableValue(name, variableOptionToVariableValue(value), source);
           }
         }}
+        inputValue={allowMultiple ? inputValue : undefined}
         onInputChange={(_, newInputValue) => {
           if (!allowMultiple) {
             setInputWidth(getWidthPx(newInputValue, 'list'));
           }
+        }}
+        onBlur={() => {
+          setInputValue('');
         }}
         options={viewOptions}
       />
