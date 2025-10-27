@@ -40,9 +40,14 @@ function NoDashboardRowOverlay(): ReactElement {
   return <NoDataOverlay resource="dashboards" />;
 }
 
-export function DashboardDataGrid(props: DataGridProperties<Row>): ReactElement {
-  const { columns, rows, initialState, hideToolbar, isLoading } = props;
-
+export function DashboardDataGrid({
+  columns,
+  rows,
+  initialState,
+  hideToolbar,
+  isLoading,
+  ...props
+}: DataGridProperties<Row>): ReactElement {
   const navigate = useNavigate();
 
   // Merging default initial state with the props initial state (props initial state will overwrite properties)
@@ -56,6 +61,7 @@ export function DashboardDataGrid(props: DataGridProperties<Row>): ReactElement 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
       <DataGrid
+        {...props}
         onRowClick={(params) => navigate(`/projects/${params.row.project}/dashboards/${params.row.name}`)}
         rows={rows}
         columns={columns}

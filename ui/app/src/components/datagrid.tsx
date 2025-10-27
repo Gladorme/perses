@@ -22,6 +22,7 @@ import {
 } from '@mui/x-data-grid';
 import { GridInitialStateCommunity } from '@mui/x-data-grid/models/gridStateCommunity';
 import { ReactElement } from 'react';
+import { NumberParam, withDefault } from 'use-query-params';
 
 export const DATA_GRID_INITIAL_STATE_SORT_BY_NAME = {
   columns: {
@@ -63,6 +64,18 @@ export const DATA_GRID_STYLES = {
 };
 
 export const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+
+export const paginationModelQueryConfig = {
+  pageSize: withDefault(NumberParam, PAGE_SIZE_OPTIONS[0], false),
+  page: withDefault(NumberParam, 0, false),
+};
+
+export function paginationModelQueryConfigWithDefaults(pageSize: number, page: number) {
+  return {
+    pageSize: withDefault(NumberParam, PAGE_SIZE_OPTIONS[0]),
+    page: withDefault(NumberParam, 0),
+  };
+}
 
 export function GridToolbar(): ReactElement {
   return (

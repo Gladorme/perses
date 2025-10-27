@@ -16,6 +16,8 @@ import { GridColDef } from '@mui/x-data-grid';
 import { GridInitialStateCommunity } from '@mui/x-data-grid/models/gridStateCommunity';
 import { DispatchWithPromise } from '@perses-dev/core';
 import { intlFormatDistance } from 'date-fns';
+import { GridPaginationModel } from '@mui/x-data-grid/models/gridPaginationProps';
+import { GridCallbackDetails } from '@mui/x-data-grid/models/api';
 
 export const PROJECT_COL_DEF: GridColDef = {
   field: 'project',
@@ -91,6 +93,8 @@ export interface ListProperties {
   hideToolbar?: boolean;
   initialState?: GridInitialStateCommunity;
   isLoading?: boolean;
+  paginationModel?: GridPaginationModel;
+  onPaginationModelChange?: (model: GridPaginationModel, details: GridCallbackDetails<'pagination'>) => void;
 }
 
 export interface ListPropertiesWithCallbacks<T> extends ListProperties {

@@ -52,9 +52,15 @@ export interface DashboardListProperties extends ListProperties {
  * @param props.isLoading Display a loading circle if enabled
  * @param props.isEphemeralDashboardEnabled Display switch button if ephemeral dashboards are enabled in copy dialog.
  */
-export function DashboardList(props: DashboardListProperties): ReactElement {
+export function DashboardList({
+  dashboardList,
+  hideToolbar,
+  isLoading,
+  initialState,
+  isEphemeralDashboardEnabled,
+  ...props
+}: DashboardListProperties): ReactElement {
   const navigate = useNavigate();
-  const { dashboardList, hideToolbar, isLoading, initialState, isEphemeralDashboardEnabled } = props;
   const { successSnackbar, exceptionSnackbar } = useSnackbar();
   const deleteDashboardMutation = useDeleteDashboardMutation();
 
@@ -214,6 +220,7 @@ export function DashboardList(props: DashboardListProperties): ReactElement {
   return (
     <Stack width="100%">
       <DashboardDataGrid
+        {...props}
         rows={rows}
         columns={columns}
         initialState={initialState}

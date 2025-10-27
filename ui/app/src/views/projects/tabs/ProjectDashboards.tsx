@@ -13,9 +13,11 @@
 
 import { Card, CardProps } from '@mui/material';
 import { ReactElement } from 'react';
+import { useQueryParams } from 'use-query-params';
 import { useDashboardList } from '../../../model/dashboard-client';
 import { DashboardList } from '../../../components/DashboardList/DashboardList';
 import { useIsEphemeralDashboardEnabled } from '../../../context/Config';
+import { paginationModelQueryConfig } from '../../../components/datagrid';
 
 interface ProjectDashboardsProps extends CardProps {
   projectName: string;
@@ -25,6 +27,7 @@ interface ProjectDashboardsProps extends CardProps {
 export function ProjectDashboards({ projectName, hideToolbar, ...props }: ProjectDashboardsProps): ReactElement {
   const { data, isLoading } = useDashboardList({ project: projectName });
   const isEphemeralDashboardEnabled = useIsEphemeralDashboardEnabled();
+  const [paginationModel, setPaginationModel] = useQueryParams(paginationModelQueryConfig, { updateType: 'replaceIn' });
 
   return (
     <Card {...props}>
@@ -32,6 +35,8 @@ export function ProjectDashboards({ projectName, hideToolbar, ...props }: Projec
         dashboardList={data ?? []}
         hideToolbar={hideToolbar}
         isLoading={isLoading}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
         initialState={{
           columns: {
             columnVisibilityModel: {
