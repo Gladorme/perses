@@ -23,6 +23,19 @@ code**, covering areas the first two audits skipped: `shared/explore`,
 `shared/components` form/dialog widgets, app views outside dashboards, auth
 flows, and panel plugins beyond the hot render paths.
 
+Plans 048–054 come from a fourth `improve` run on 2026-07-21 focused again on
+**React re-renders**, but on hot paths the earlier re-render audit (026–034)
+did **not** cover: chart plugins beyond timeseries (pie, scatter, heatmap,
+statchart), the list-variable Autocomplete, the shared `Legend` item path, the
+CodeMirror query editors, `ValidationProvider`, and `Panel`'s own action-load
+effect + its already-`memo`'d prop boundary. This run was planned against a
+newer `shared` checkout — commit `472a289` (the repo has advanced from the
+`f8cd4b7` used by plans 001–034) — and the same `plugins` commit `d7075da`.
+Before executing any of 048–054, honor its own drift check (each plan pins its
+exact commit). See "Coverage of the 2026-07-21 re-render run" below for
+findings that were already planned by 002/005/027/032/033 and are therefore
+**not** re-planned here.
+
 Execute in the order below unless dependencies say otherwise. Independent plans
 in the same wave may run in parallel. Each executor must read its plan fully,
 honor its STOP conditions, run commands from the composite workspace root unless
@@ -87,6 +100,13 @@ test under that toolchain.
 | [045](045-datetimepicker-key-reset.md) | Reset DateTimeRangePicker state per initial range | P3 | S | — | TODO |
 | [046](046-discard-dialog-aria.md) | Fix the discard-changes dialog title association (a11y) | P3 | S | — | TODO |
 | [047](047-prom-alignment-tz.md) | Investigate client-timezone dependence of Prometheus range alignment | P2 | M | — | TODO |
+| [048](048-memoize-chart-plugin-echart-options.md) | Memoize chart-plugin ECharts option objects (pie, scatter, heatmap, statchart) | P2 | M | — | TODO |
+| [049](049-hoist-variable-autocomplete-filter.md) | Hoist the list-variable Autocomplete filter factory out of render | P2 | S | — | TODO |
+| [050](050-stabilize-legend-item-handlers.md) | Restore ListLegendItem memo (stabilize legend handlers + per-item sx) | P3 | S | — | TODO |
+| [051](051-stabilize-codemirror-editor-extensions.md) | Stabilize CodeMirror query-editor extensions (PromQL, TraceQL) | P2 | S | — | TODO |
+| [052](052-memoize-validation-provider-context.md) | Memoize the ValidationProvider context value and setters | P3 | S | — | TODO |
+| [053](053-key-panel-actions-by-plugin-kind.md) | Load Panel plugin actions by plugin kind, not on every query result | P2 | S-M | — | TODO |
+| [054](054-restore-panel-memo-effectiveness.md) | Restore Panel React.memo effectiveness (stabilize grid-item props) | P3 | M | 027 | TODO |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) |
 REJECTED (with one-line rationale — finding fixed independently or approach
@@ -114,6 +134,12 @@ abandoned)
 8. **Wave H — bug fixes (035–047):** all independent of each other and of
    other waves, EXCEPT 036 which must land before 025. 035, 037, 038, 041
    first (highest impact); 047 is investigate-first.
+9. **Wave I — re-render hot paths not covered by 026–034 (048–054):** 048, 049,
+   051, 052, 053 are independent of everything and of each other; run in
+   parallel any time. 050 is independent but touches legend interaction that
+   also appears in 028/029 — run 050 against a fresh drift check if either
+   landed first. 054 depends on 027 (land 027 first) and complements 053;
+   prefer landing 053 before 054 since both edit `Panel.tsx`/its surroundings.
 
 ## Dependency notes
 
@@ -153,6 +179,22 @@ abandoned)
   the consolidated hook's surroundings and creates conflicting diffs.
 - 038 (JSONEditor) improves the Edit-JSON dialog touched conceptually by 024
   (datasource ownership) — no file overlap, order-independent.
+- 054 depends on 027: 027 stabilizes the variable contexts `Panel` consumes, so
+  the `memo(Panel)` benefit from 054's prop stabilization is only observable
+  once 027 has landed. 054 also touches the `Panel.tsx` neighborhood as 053
+  (which changes `Panel`'s internal action effect) — prefer 053 → 054, and run
+  the second against a fresh drift check.
+- 053 and 054 both concern `Panel` but are disjoint: 053 edits `Panel.tsx`
+  (action-load effect), 054 edits `GridItemContent.tsx`/`Row.tsx` (props passed
+  to `Panel`) and must NOT edit `Panel.tsx`. No hard ordering, but land 053
+  first to keep 054's memo test meaningful.
+- 048 is complementary to — not a replacement for — the deferred `EChart`
+  `isEqual` note (see "Findings considered and rejected"): it stops handing
+  `EChart` fresh option objects/closures so the existing guard can short-circuit
+  cheaply. Do not weaken the guard.
+- 050 touches the same legend-interaction surface as 028 (tooltip throttle) and
+  029 (TimeSeriesChartPanel legend memo split) but different files; if 028/029
+  land first, re-run 050's drift check.
 
 ## Overlap between audit sets
 
@@ -178,6 +220,10 @@ remaining unique steps into a follow-up:
   keep their dependency order even when other plans are parallelized.
 - Plans 012 and 015 both touch `shared/components` EChart code.
 - Plans 014 and 015 both touch `shared/plugin-system` remote-plugin loading.
+- Plans 048 and 051 both live in the `plugins` repo but in disjoint packages
+  (048: pie/scatter/heatmap/stat chart plugins; 051: prometheus + tempo).
+- Plan 052 touches `shared/plugin-system` (`ValidationProvider`) — disjoint
+  from 014/015's remote-plugin loader paths.
 - All other plans have disjoint primary implementation paths, but executors
   should still run each plan's drift check before editing.
 
@@ -188,6 +234,46 @@ the existing `shared` install was missing `cross-env`, and installed internal
 packages under `plugins` did not match the checked-out workspace versions.
 Executors should run the exact install/bootstrap command in their plan before
 interpreting package-test failures as code regressions.
+
+## Coverage of the 2026-07-21 re-render run (plans 048–054)
+
+The fourth run's audit surfaced 13 findings. Seven became plans 048–054. The
+rest were already planned or already rejected by earlier sets and are **not**
+duplicated:
+
+- **Variable context provider values re-created each render** → already
+  **plan 027** (VariableProvider + RepeatGridLayout). Same fix, do not
+  duplicate.
+- **`DashboardProvider` rebuilds the store every render** → already
+  **plan 002** (lazy store initializer).
+- **`VirtualizedTable` recomputes per-cell interpolation maps** → already
+  **plan 005** (row-interpolation reuse) and **plan 033** (row memo). 048–054
+  add nothing here.
+- **`JSON.stringify` deep-equality in the variable selector** → already
+  **plan 032**.
+- **`timeseriestable` renders up to 1000 non-virtualized rows** → matches the
+  earlier "adding virtualization to every table path" rejection (see below);
+  MED confidence that it is a real hotspot in practice. No plan; revisit with
+  profiling / a report of large single-panel series counts.
+- **`useDashboard` rebuilds the dashboard object + unmemoized
+  `convertPanelGroupsToLayouts` each call**
+  (`shared/dashboards/src/context/useDashboard.tsx`): MED confidence and
+  conceptually overlaps plan 008's subscription-boundary work; not on a
+  confirmed hot path (used mainly in edit/save/JSON flows). No plan now —
+  fold into 008's follow-up if profiling shows it matters.
+
+Verified already-good and NOT planned by this run: `TimeSeriesChartPanel`/
+`TimeSeriesChartBase`, `BarChartBase`, and `GaugeChartBase` (via `useDeepMemo`)
+already memoize their options; most `plugin-system` runtime providers
+(TimeRange, Charts, DataQueries, Selection) already `useMemo` their values;
+`GridItemContent` already defers offscreen panel queries via an intersection
+observer.
+
+This run covered (standard depth): `plugins` pie/scatter/heatmap/stat chart
+panels + prometheus/tempo query editors; `shared/components` Legend;
+`shared/dashboards` Variable/Panel/GridLayout; `shared/plugin-system`
+ValidationProvider. Not covered by it: `shared/explore`, `shared/client`,
+non-hot plugins, bundle size, the Go backend, e2e infra.
 
 ## Findings considered and rejected
 
