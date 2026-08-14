@@ -13,9 +13,10 @@
 
 import { fetchJson, GlobalSecretResource, StatusError } from '@perses-dev/core';
 import { useMutation, UseMutationResult, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
-import buildURL from './url-builder';
+
 import { HTTPHeader, HTTPMethodDELETE, HTTPMethodGET, HTTPMethodPOST, HTTPMethodPUT } from './http';
 import { buildQueryKey } from './querykey-builder';
+import buildURL from './url-builder';
 
 const resource = 'globalsecrets';
 

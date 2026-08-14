@@ -11,8 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createContext, useContext, useMemo } from 'react';
 import { BuiltinVariableDefinition } from '@perses-dev/core';
+import { createContext, useContext, useMemo } from 'react';
+
 import { VariableStateMap } from './variables';
 
 export type BuiltinVariableSrv = {

@@ -11,21 +11,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Box, Stack, Tooltip } from '@mui/material';
+import { GridColDef, GridRowParams } from '@mui/x-data-grid';
+import { useSnackbar } from '@perses-dev/components';
 import {
   getResourceDisplayName,
   EphemeralDashboardResource,
   parseDurationString,
   getResourceExtendedDisplayName,
 } from '@perses-dev/core';
-import { Box, Stack, Tooltip } from '@mui/material';
-import { GridColDef, GridRowParams } from '@mui/x-data-grid';
+import { intlFormatDistance, add } from 'date-fns';
 import DeleteIcon from 'mdi-material-ui/DeleteOutline';
 import PencilIcon from 'mdi-material-ui/Pencil';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
-import { intlFormatDistance, add } from 'date-fns';
-import { useSnackbar } from '@perses-dev/components';
-import { DeleteResourceDialog, UpdateEphemeralDashboardDialog } from '../dialogs';
+
+import { useDeleteEphemeralDashboardMutation } from '../../model/ephemeral-dashboard-client';
 import { CRUDGridActionsCellItem } from '../CRUDButton/CRUDGridActionsCellItem';
+import { DeleteResourceDialog, UpdateEphemeralDashboardDialog } from '../dialogs';
 import {
   CREATED_AT_COL_DEF,
   DISPLAY_NAME_COL_DEF,
@@ -34,7 +36,6 @@ import {
   UPDATED_AT_COL_DEF,
   VERSION_COL_DEF,
 } from '../list';
-import { useDeleteEphemeralDashboardMutation } from '../../model/ephemeral-dashboard-client';
 import { EphemeralDashboardDataGrid, Row } from './EphemeralDashboardDataGrid';
 
 export interface EphemeralDashboardListProperties extends ListProperties {

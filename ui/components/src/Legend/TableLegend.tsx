@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { ReactElement, useMemo } from 'react';
+
 import { Table, TableProps, TableColumnConfig } from '../Table';
 import { LegendItem } from './legend-model';
 

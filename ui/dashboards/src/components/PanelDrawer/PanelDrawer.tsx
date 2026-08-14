@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ReactElement, useState, useMemo, ReactNode, useCallback } from 'react';
 import { Drawer, ErrorAlert, ErrorBoundary } from '@perses-dev/components';
 import { PanelEditorValues } from '@perses-dev/core';
 import { useVariableValues, VariableContext } from '@perses-dev/plugin-system';
+import { ReactElement, useState, useMemo, ReactNode, useCallback } from 'react';
+
 import { usePanelEditor } from '../../context';
 import { PanelEditorForm } from './PanelEditorForm';
 

@@ -11,10 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { usePlugin, PanelProps } from '@perses-dev/plugin-system';
-import { UnknownSpec, QueryDataType } from '@perses-dev/core';
-import { ReactElement } from 'react';
 import { Skeleton } from '@mui/material';
+import { UnknownSpec, QueryDataType } from '@perses-dev/core';
+import { usePlugin, PanelProps } from '@perses-dev/plugin-system';
+import { ReactElement } from 'react';
 
 interface PanelPluginProps extends PanelProps<UnknownSpec, QueryDataType> {
   kind: string;

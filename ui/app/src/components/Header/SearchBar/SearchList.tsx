@@ -11,13 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { isProjectMetadata, Resource } from '@perses-dev/core';
-import { ReactElement, useEffect, useMemo, useRef, useState } from 'react';
-import { KVSearch, KVSearchConfiguration, KVSearchResult } from '@nexucis/kvsearch';
 import { Box, Button, Chip, Typography } from '@mui/material';
+import { KVSearch, KVSearchConfiguration, KVSearchResult } from '@nexucis/kvsearch';
+import { isProjectMetadata, Resource } from '@perses-dev/core';
 import Archive from 'mdi-material-ui/Archive';
 import MiddleAlertIcon from 'mdi-material-ui/StarFourPointsOutline';
+import { ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+
 import { ProjectRoute } from '../../../model/route';
 
 const kvSearchConfig: KVSearchConfiguration = {
@@ -90,21 +91,19 @@ export function SearchList(props: SearchListProps): ReactElement | null {
             marginBottom: 1,
             marginLeft: 1,
             marginRight: 1,
-            backgroundColor: (theme) =>
-              search.original.highlight
-                ? theme.palette.mode === 'dark'
-                  ? 'rgba(255, 165, 0, 0.2)'
-                  : 'rgba(255, 223, 186, 0.3)'
-                : 'inherit',
-            borderColor: (theme) =>
-              search.original.highlight ? (theme.palette.mode === 'dark' ? 'orange' : 'darkorange') : 'inherit',
+            backgroundColor: (theme) => {
+              if (!search.original.highlight) return 'inherit';
+              return theme.palette.mode === 'dark' ? 'rgba(255, 165, 0, 0.2)' : 'rgba(255, 223, 186, 0.3)';
+            },
+            borderColor: (theme) => {
+              if (!search.original.highlight) return 'inherit';
+              return theme.palette.mode === 'dark' ? 'orange' : 'darkorange';
+            },
             fontWeight: search.original.highlight ? 'bold' : 'normal',
-            color: (theme) =>
-              search.original.highlight
-                ? theme.palette.mode === 'dark'
-                  ? theme.palette.warning.light
-                  : 'inherit'
-                : 'inherit',
+            color: (theme) => {
+              if (!search.original.highlight) return 'inherit';
+              return theme.palette.mode === 'dark' ? theme.palette.warning.light : 'inherit';
+            },
           }}
           component={RouterLink}
           onClick={props.onClick}

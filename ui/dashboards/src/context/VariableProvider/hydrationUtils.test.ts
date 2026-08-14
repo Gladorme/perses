@@ -13,6 +13,7 @@
 
 import { DEFAULT_ALL_VALUE, VariableDefinition } from '@perses-dev/core';
 import { ExternalVariableDefinition } from '@perses-dev/dashboards';
+
 import { hydrateVariableDefinitionStates } from './hydrationUtils';
 
 describe('hydrateVariableStates', () => {

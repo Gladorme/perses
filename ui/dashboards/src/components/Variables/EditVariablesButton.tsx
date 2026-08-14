@@ -11,12 +11,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ReactElement, useState } from 'react';
 import { Button, ButtonProps } from '@mui/material';
-import PencilIcon from 'mdi-material-ui/PencilOutline';
 import { Drawer, InfoTooltip } from '@perses-dev/components';
 import { BuiltinVariableDefinition, VariableDefinition } from '@perses-dev/core';
 import { useBuiltinVariableDefinitions } from '@perses-dev/plugin-system';
+import PencilIcon from 'mdi-material-ui/PencilOutline';
+import { ReactElement, useState } from 'react';
+
 import { TOOLTIP_TEXT, editButtonStyle } from '../../constants';
 import {
   ExternalVariableDefinition,

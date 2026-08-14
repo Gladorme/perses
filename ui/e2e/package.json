@@ -10,8 +10,8 @@
     "e2e:report": "playwright show-report",
     "e2e:watch": "chokidar src/tests/**/**.ts -c 'playwright test {path}'",
     "e2e:ci": "playwright test --config=src/config/ci.playwright.config.ts",
-    "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "npm run lint -- --fix"
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src"
   },
   "dependencies": {
     "@perses-dev/core": "0.52.0",

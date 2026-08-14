@@ -13,6 +13,7 @@
 
 import { useEvent } from '@perses-dev/core';
 import { useCallback, useRef } from 'react';
+
 import { PluginLoader, PluginMetadataWithModule, PluginModuleResource, PluginType } from '../../model';
 
 export interface PluginIndexes {

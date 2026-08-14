@@ -14,8 +14,9 @@
 import { Button, ButtonProps, Tooltip } from '@mui/material';
 import { Action, Scope } from '@perses-dev/core';
 import { ReactElement } from 'react';
-import { useIsReadonly } from '../../context/Config';
+
 import { GlobalProject, useHasPermission } from '../../context/Authorization';
+import { useIsReadonly } from '../../context/Config';
 import { useIsMobileSize } from '../../utils/browser-size';
 
 export interface CRUDButtonProps extends Omit<ButtonProps, 'action'> {

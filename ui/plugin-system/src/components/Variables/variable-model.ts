@@ -13,6 +13,7 @@
 
 import { ListVariableDefinition } from '@perses-dev/core';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
+
 import { VariableOption } from '../../model';
 import { useDatasourceStore, usePlugin, useTimeRange, useAllVariableValues, VariableStateMap } from '../../runtime';
 

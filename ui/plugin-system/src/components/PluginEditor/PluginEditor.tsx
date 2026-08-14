@@ -12,10 +12,11 @@
 // limitations under the License.
 
 import { Box, Button } from '@mui/material';
-import Reload from 'mdi-material-ui/Reload';
 import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
-import { forwardRef, ReactElement, useCallback, useImperativeHandle, useMemo, useState } from 'react';
 import { UnknownSpec } from '@perses-dev/core';
+import Reload from 'mdi-material-ui/Reload';
+import { forwardRef, ReactElement, useCallback, useImperativeHandle, useMemo, useState } from 'react';
+
 import { PluginKindSelect } from '../PluginKindSelect';
 import { PluginSpecEditor } from '../PluginSpecEditor';
 import { PluginEditorProps, PluginEditorRef, usePluginEditor } from './plugin-editor-api';
@@ -42,7 +43,7 @@ export const PluginEditor = forwardRef<PluginEditorRef, PluginEditorProps>((prop
   } = props;
   const { pendingSelection, isLoading, error, onSelectionChange, onSpecChange } = usePluginEditor(props);
 
-  /* 
+  /*
      We could technically merge the watchedQuery, watchedOtherSpecs into a single watched-object,
      because at the end of the day, they are all specs.
      However, let's have them separated to keep the code simple and readable.

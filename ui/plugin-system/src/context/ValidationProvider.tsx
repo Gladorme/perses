@@ -11,7 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createContext, ReactElement, ReactNode, useContext, useState } from 'react';
 import {
   DatasourceDefinition,
   PanelEditorValues,
@@ -24,6 +23,7 @@ import {
   buildPanelEditorSchema,
   buildVariableDefinitionSchema,
 } from '@perses-dev/core';
+import { createContext, ReactElement, ReactNode, useContext, useState } from 'react';
 import { z } from 'zod';
 
 export interface ValidationSchemas {

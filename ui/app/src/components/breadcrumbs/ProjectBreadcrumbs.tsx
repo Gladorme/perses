@@ -12,10 +12,11 @@
 // limitations under the License.
 
 import { Typography } from '@mui/material';
+import { getResourceDisplayName, ProjectResource } from '@perses-dev/core';
 import Archive from 'mdi-material-ui/Archive';
 import ViewDashboardIcon from 'mdi-material-ui/ViewDashboard';
-import { getResourceDisplayName, ProjectResource } from '@perses-dev/core';
 import { ReactElement } from 'react';
+
 import { HomeLinkCrumb, Breadcrumbs, LinkCrumb, StackCrumb, TitleCrumb } from './breadcrumbs';
 
 interface ProjectBreadcrumbsProps {

@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { useTheme } from '@mui/material';
 import {
   useReactTable,
   getCoreRowModel,
@@ -23,11 +24,11 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
 } from '@tanstack/react-table';
-import { useTheme } from '@mui/material';
 import { ReactElement, useCallback, useMemo } from 'react';
-import { VirtualizedTable } from './VirtualizedTable';
-import { TableCheckbox } from './TableCheckbox';
+
 import { TableProps, persesColumnsToTanstackColumns, DEFAULT_COLUMN_WIDTH } from './model/table-model';
+import { TableCheckbox } from './TableCheckbox';
+import { VirtualizedTable } from './VirtualizedTable';
 
 const DEFAULT_GET_ROW_ID = (data: unknown, index: number): string => {
   return `${index}`;

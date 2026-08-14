@@ -11,14 +11,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useMutation, UseMutationResult, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { fetch, fetchJson } from '@perses-dev/core';
+import { useMutation, UseMutationResult, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { decodeToken } from 'react-jwt';
-import { useEffect, useState } from 'react';
 import { useQueryParam } from 'use-query-params';
-import buildURL from './url-builder';
+
 import { HTTPHeader, HTTPMethodPOST } from './http';
+import buildURL from './url-builder';
 
 const authResource = 'auth';
 const jwtPayload = 'jwtPayload';

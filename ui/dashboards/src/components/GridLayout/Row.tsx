@@ -12,11 +12,12 @@
 // limitations under the License.
 
 import { Collapse, useTheme } from '@mui/material';
+import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
 import { PanelGroupId } from '@perses-dev/core';
 import { PanelGroupDefinition, PanelGroupItemLayout, PanelOptions, useViewPanelGroup } from '@perses-dev/dashboards';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
 import { Layout, Layouts, Responsive, WidthProvider } from 'react-grid-layout';
-import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
+
 import { GRID_LAYOUT_COLS, GRID_LAYOUT_SMALL_BREAKPOINT } from '../../constants';
 import { GridContainer } from './GridContainer';
 import { GridItemContent } from './GridItemContent';
@@ -132,22 +133,20 @@ export function Row({
           onWidthChange={onWidthChange}
           allowOverlap={hasViewPanel} // Enabling overlap when viewing a specific panel because panel in front of the viewed panel will add empty spaces (empty row height)
         >
-          {itemLayouts.map(({ i, w }) => (
-            <div
-              key={i}
-              style={{
-                display: itemLayoutViewed ? (itemLayoutViewed === i ? 'unset' : 'none') : 'unset',
-              }}
-            >
-              <ErrorBoundary FallbackComponent={ErrorAlert}>
-                <GridItemContent
-                  panelOptions={panelOptions}
-                  panelGroupItemId={{ panelGroupId, panelGroupItemLayoutId: i, repeatVariable }}
-                  width={calculateGridItemWidth(w, gridColWidth)}
-                />
-              </ErrorBoundary>
-            </div>
-          ))}
+          {itemLayouts.map(({ i, w }) => {
+            const display = itemLayoutViewed && itemLayoutViewed !== i ? 'none' : 'unset';
+            return (
+              <div key={i} style={{ display }}>
+                <ErrorBoundary FallbackComponent={ErrorAlert}>
+                  <GridItemContent
+                    panelOptions={panelOptions}
+                    panelGroupItemId={{ panelGroupId, panelGroupItemLayoutId: i, repeatVariable }}
+                    width={calculateGridItemWidth(w, gridColWidth)}
+                  />
+                </ErrorBoundary>
+              </div>
+            );
+          })}
         </ResponsiveGridLayout>
       </Collapse>
     </GridContainer>

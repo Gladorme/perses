@@ -11,12 +11,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { MouseEvent, ReactElement, useState } from 'react';
 import { Divider, IconButton, ListItemIcon, Menu, MenuItem } from '@mui/material';
-import AccountCircle from 'mdi-material-ui/AccountCircle';
 import AccountBox from 'mdi-material-ui/AccountBox';
+import AccountCircle from 'mdi-material-ui/AccountCircle';
 import Logout from 'mdi-material-ui/Logout';
+import { MouseEvent, ReactElement, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+
 import { useAuthToken } from '../../model/auth-client';
 import { ProfileRoute } from '../../model/route';
 import { ThemeSwitch } from './ThemeSwitch';

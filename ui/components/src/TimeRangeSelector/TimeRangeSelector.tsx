@@ -12,9 +12,10 @@
 // limitations under the License.
 
 import { Box, MenuItem, Popover, Select } from '@mui/material';
-import Calendar from 'mdi-material-ui/Calendar';
 import { TimeRangeValue, isRelativeTimeRange, AbsoluteTimeRange, toAbsoluteTimeRange } from '@perses-dev/core';
+import Calendar from 'mdi-material-ui/Calendar';
 import { ReactElement, useMemo, useRef, useState } from 'react';
+
 import { useTimeZone } from '../context';
 import { TimeOption } from '../model';
 import { DateTimeRangePicker } from './DateTimeRangePicker';

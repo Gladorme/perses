@@ -12,13 +12,14 @@
 // limitations under the License.
 
 import { Box } from '@mui/material';
-import { Outlet, useLocation } from 'react-router-dom';
-import { ReactElement, Suspense } from 'react';
 import { ReactRouterProvider } from '@perses-dev/plugin-system';
-import Header from './components/Header/Header';
+import { ReactElement, Suspense } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+
 import Footer from './components/Footer';
-import { SignInRoute, SignUpRoute } from './model/route';
+import Header from './components/Header/Header';
 import { PersesLoader } from './components/PersesLoader';
+import { SignInRoute, SignUpRoute } from './model/route';
 
 function isDashboardViewRoute(pathname: string): boolean {
   return /\/projects\/[a-zA-Z0-9_]+\/dashboards\/[a-zA-Z0-9_]+/.test(pathname);

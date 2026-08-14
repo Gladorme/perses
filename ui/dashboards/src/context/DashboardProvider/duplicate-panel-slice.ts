@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { StateCreator } from 'zustand';
+
 import { insertPanelInLayout, UnpositionedPanelGroupItemLayout } from '../../utils/panelUtils';
 import { generateId, Middleware } from './common';
 import { PanelGroupSlice, PanelGroupItemId } from './panel-group-slice';

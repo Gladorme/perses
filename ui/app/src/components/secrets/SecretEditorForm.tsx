@@ -11,10 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Secret, secretsEditorSchema, SecretsEditorSchemaType } from '@perses-dev/core';
-import React, { ReactElement, SyntheticEvent, useEffect, useMemo, useState } from 'react';
-import { getSubmitText, getTitleAction } from '@perses-dev/plugin-system';
-import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
@@ -37,8 +33,13 @@ import {
   Typography,
 } from '@mui/material';
 import { DiscardChangesConfirmationDialog, FormActions } from '@perses-dev/components';
-import TrashIcon from 'mdi-material-ui/TrashCan';
+import { Secret, secretsEditorSchema, SecretsEditorSchemaType } from '@perses-dev/core';
+import { getSubmitText, getTitleAction } from '@perses-dev/plugin-system';
 import PlusIcon from 'mdi-material-ui/Plus';
+import TrashIcon from 'mdi-material-ui/TrashCan';
+import React, { ReactElement, SyntheticEvent, useEffect, useMemo, useState } from 'react';
+import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+
 import { FormEditorProps } from '../form-drawers';
 
 const noAuthIndex = 'noAuth';
@@ -49,6 +50,26 @@ const oauthIndex = 'oauth';
 type SecretEditorFormProps = FormEditorProps<Secret>;
 
 type EndpointParams = Record<string, string[]> | undefined;
+
+function getInitialTabValue(secret: Secret): string {
+  if (secret.spec.basicAuth) return basicAuthIndex;
+  if (secret.spec.authorization) return authorizationIndex;
+  if (secret.spec.oauth) return oauthIndex;
+  return noAuthIndex;
+}
+
+function getAuthStyleDescription(authStyle: number | undefined): string {
+  switch (authStyle) {
+    case 0:
+      return 'Automatically detect the best auth style to use based on the provider';
+    case 1:
+      return 'Send OAuth credentials as URL parameters';
+    case 2:
+      return 'Send OAuth credentials using HTTP Basic Authorization';
+    default:
+      return '';
+  }
+}
 
 export function SecretEditorForm({
   initialValue,
@@ -111,15 +132,7 @@ export function SecretEditorForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.formState.isValid]);
 
-  const [tabValue, setTabValue] = useState<string>(
-    initialSecretClean.spec.basicAuth
-      ? basicAuthIndex
-      : initialSecretClean.spec.authorization
-        ? authorizationIndex
-        : initialSecretClean.spec.oauth
-          ? oauthIndex
-          : noAuthIndex
-  );
+  const [tabValue, setTabValue] = useState<string>(getInitialTabValue(initialSecretClean));
 
   const handleTabChange = (event: SyntheticEvent, newValue: string): void => {
     form.setValue('spec.authorization', undefined);
@@ -652,18 +665,7 @@ export function SecretEditorForm({
                   control={form.control}
                   name="spec.oauth.authStyle"
                   render={({ field, fieldState }) => (
-                    <Tooltip
-                      title={
-                        field.value === 0
-                          ? 'Automatically detect the best auth style to use based on the provider'
-                          : field.value === 1
-                            ? 'Send OAuth credentials as URL parameters'
-                            : field.value === 2
-                              ? 'Send OAuth credentials using HTTP Basic Authorization'
-                              : ''
-                      }
-                      placement="right"
-                    >
+                    <Tooltip title={getAuthStyleDescription(field.value)} placement="right">
                       <FormControl fullWidth error={!!fieldState.error}>
                         <InputLabel id="auth-style-label" shrink={action === 'read' ? true : undefined}>
                           Auth Style

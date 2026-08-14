@@ -11,10 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Button } from '@mui/material';
+import { Dialog } from '@perses-dev/components';
 import { getResourceExtendedDisplayName, Resource } from '@perses-dev/core';
 import { Dispatch, DispatchWithoutAction, ReactElement } from 'react';
-import { Dialog } from '@perses-dev/components';
-import { Button } from '@mui/material';
 
 interface DeleteResourceDialogProps<T extends Resource> {
   resource: T;

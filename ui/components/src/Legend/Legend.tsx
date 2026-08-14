@@ -12,14 +12,15 @@
 // limitations under the License.
 
 import { Box } from '@mui/material';
+import { getLegendMode } from '@perses-dev/core';
 import { produce } from 'immer';
 import { ReactElement, ReactNode } from 'react';
-import { getLegendMode } from '@perses-dev/core';
-import { ListLegend } from './ListLegend';
+
 import { CompactLegend } from './CompactLegend';
-import { TableLegend, TableLegendProps } from './TableLegend';
 import { LegendItem, LegendComponentOptions, SelectedLegendItemState } from './legend-model';
+import { ListLegend } from './ListLegend';
 import { ListLegendItemProps } from './ListLegendItem';
+import { TableLegend, TableLegendProps } from './TableLegend';
 
 export interface LegendProps {
   width: number;

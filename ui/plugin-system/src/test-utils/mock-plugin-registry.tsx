@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { UnknownSpec } from '@perses-dev/core';
+
 import { PluginRegistryProps } from '../components';
 import { PluginModuleResource, Plugin, PluginLoader, PluginImplementation, PluginType } from '../model';
 

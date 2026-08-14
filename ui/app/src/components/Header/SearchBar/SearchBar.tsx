@@ -12,21 +12,22 @@
 // limitations under the License.
 
 import { Alert, Box, Button, Chip, InputAdornment, Modal, Paper, TextField, Typography } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import { isProjectMetadata, Resource } from '@perses-dev/core';
+import Archive from 'mdi-material-ui/Archive';
+import Close from 'mdi-material-ui/Close';
+import DatabaseIcon from 'mdi-material-ui/Database';
 import Magnify from 'mdi-material-ui/Magnify';
 import ViewDashboardIcon from 'mdi-material-ui/ViewDashboard';
-import Archive from 'mdi-material-ui/Archive';
-import DatabaseIcon from 'mdi-material-ui/Database';
 import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
-import { isProjectMetadata, Resource } from '@perses-dev/core';
-import IconButton from '@mui/material/IconButton';
-import Close from 'mdi-material-ui/Close';
-import { useIsMobileSize } from '../../../utils/browser-size';
-import { isAppleDevice } from '../../../utils/os';
+
 import { useDashboardList, useImportantDashboardList } from '../../../model/dashboard-client';
-import { useProjectList } from '../../../model/project-client';
-import { AdminRoute, ProjectRoute } from '../../../model/route';
 import { useDatasourceList } from '../../../model/datasource-client';
 import { useGlobalDatasourceList } from '../../../model/global-datasource-client';
+import { useProjectList } from '../../../model/project-client';
+import { AdminRoute, ProjectRoute } from '../../../model/route';
+import { useIsMobileSize } from '../../../utils/browser-size';
+import { isAppleDevice } from '../../../utils/os';
 import { SearchList } from './SearchList';
 
 function shortcutCTRL(): string {

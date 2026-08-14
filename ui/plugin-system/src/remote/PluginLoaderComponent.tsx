@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { useEffect, useRef, useState } from 'react';
+
 import { PersesPlugin, RemotePluginModule } from './PersesPlugin.types';
 import { usePluginRuntime } from './PluginRuntime';
 

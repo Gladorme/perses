@@ -11,11 +11,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { DiscardChangesConfirmationDialog } from '@perses-dev/components';
 import { DashboardResource, EphemeralDashboardResource } from '@perses-dev/core';
+import type { BlockerFunction } from '@remix-run/router';
 import { ReactElement, ReactNode, useEffect } from 'react';
 import { useBlocker } from 'react-router-dom';
-import { DiscardChangesConfirmationDialog } from '@perses-dev/components';
-import type { BlockerFunction } from '@remix-run/router';
 
 const handleRouteChange = (event: BeforeUnloadEvent): string => {
   event.preventDefault();

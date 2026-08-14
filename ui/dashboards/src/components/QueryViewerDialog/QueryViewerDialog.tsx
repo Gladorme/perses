@@ -11,11 +11,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { ReactElement, useMemo } from 'react';
-import { Dialog } from '@perses-dev/components';
 import { Button, Divider } from '@mui/material';
-import { PluginSpecEditor } from '@perses-dev/plugin-system';
+import { Dialog } from '@perses-dev/components';
 import { QueryDefinition } from '@perses-dev/core';
+import { PluginSpecEditor } from '@perses-dev/plugin-system';
+import React, { ReactElement, useMemo } from 'react';
 
 export interface QueryViewerDialogProps {
   open: boolean;

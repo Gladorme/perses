@@ -13,6 +13,7 @@
 
 import { TimeSeriesValueTuple } from '@perses-dev/core';
 import { LineSeriesOption, BarSeriesOption } from 'echarts/charts';
+
 import { LegendItem } from '../Legend';
 
 // adjust display when there are many time series to help with performance

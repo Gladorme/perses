@@ -11,19 +11,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { DispatchWithoutAction, ReactElement, useState } from 'react';
-import { Box, Typography, Switch, TextField, Grid, FormControlLabel, MenuItem, Stack, Divider } from '@mui/material';
-import { VariableDefinition, ListVariableDefinition, Action } from '@perses-dev/core';
-import { DiscardChangesConfirmationDialog, ErrorAlert, ErrorBoundary, FormActions } from '@perses-dev/components';
-import { Control, Controller, FormProvider, SubmitHandler, useForm, useFormContext, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Box, Typography, Switch, TextField, Grid, FormControlLabel, MenuItem, Stack, Divider } from '@mui/material';
+import { DiscardChangesConfirmationDialog, ErrorAlert, ErrorBoundary, FormActions } from '@perses-dev/components';
+import { VariableDefinition, ListVariableDefinition, Action } from '@perses-dev/core';
+import { DispatchWithoutAction, ReactElement, useState } from 'react';
+import { Control, Controller, FormProvider, SubmitHandler, useForm, useFormContext, useWatch } from 'react-hook-form';
+
+import { useValidationSchemas } from '../../../context';
+import { useTimeRange } from '../../../runtime';
 import { getSubmitText, getTitleAction } from '../../../utils';
 import { PluginEditor } from '../../PluginEditor';
-import { useValidationSchemas } from '../../../context';
 import { VARIABLE_TYPES } from '../variable-model';
-import { useTimeRange } from '../../../runtime';
-import { VariableListPreview, VariablePreview } from './VariablePreview';
 import { SORT_METHODS, SortMethodName } from './variable-editor-form-model';
+import { VariableListPreview, VariablePreview } from './VariablePreview';
 
 function FallbackPreview(): ReactElement {
   return <div>Error previewing values</div>;

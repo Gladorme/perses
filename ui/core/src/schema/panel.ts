@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { z } from 'zod';
+
 import { Link, PanelDefinition, PanelDisplay, PanelEditorValues, PanelSpec, QueryDefinition } from '../model';
 import { PluginSchema, pluginSchema } from './plugin';
 

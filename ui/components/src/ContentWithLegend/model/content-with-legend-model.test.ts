@@ -13,6 +13,7 @@
 
 import { createTheme } from '@mui/material';
 import { legendModes, legendSizes } from '@perses-dev/core';
+
 import * as table from '../../Table';
 import {
   ContentWithLegendLayoutOpts,

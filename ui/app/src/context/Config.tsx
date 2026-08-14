@@ -11,14 +11,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { createContext, ReactElement, useContext, useMemo } from 'react';
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
+import { buildRelativeTimeOption } from '@perses-dev/components';
 import { DashboardSelector, DurationString } from '@perses-dev/core';
 import { TimeRangeSettingsProvider } from '@perses-dev/plugin-system';
-import { buildRelativeTimeOption } from '@perses-dev/components';
-import { Banner, ConfigModel, useConfig } from '../model/config-client';
+import DOMPurify from 'dompurify';
+import { marked } from 'marked';
+import React, { createContext, ReactElement, useContext, useMemo } from 'react';
+
 import { PersesLoader } from '../components/PersesLoader';
+import { Banner, ConfigModel, useConfig } from '../model/config-client';
 
 interface ConfigContextType {
   config: ConfigModel;

@@ -20,6 +20,7 @@ import {
   shouldShortenValues,
 } from '@perses-dev/core';
 import { ReactElement } from 'react';
+
 import { OptionsEditorControl } from '../OptionsEditorLayout';
 import { SettingsAutocomplete } from '../SettingsAutocomplete';
 

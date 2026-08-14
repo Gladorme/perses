@@ -13,11 +13,12 @@
 
 import { Box, Card, CardContent, Typography, Divider, Button } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { ReactElement, useMemo, useState } from 'react';
-import { PluginModuleResource } from '@perses-dev/plugin-system';
 import { useSnackbar } from '@perses-dev/components';
-import { usePlugins } from '../../model/plugin-client';
+import { PluginModuleResource } from '@perses-dev/plugin-system';
+import { ReactElement, useMemo, useState } from 'react';
+
 import { PersesLoader } from '../../components/PersesLoader';
+import { usePlugins } from '../../model/plugin-client';
 import { PluginDetailsDialog } from './PluginDetailsDialog';
 
 export function PluginsList(): ReactElement {

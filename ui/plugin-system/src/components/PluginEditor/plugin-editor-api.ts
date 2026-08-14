@@ -13,12 +13,13 @@
 
 import { BoxProps } from '@mui/material';
 import { UnknownSpec, useEvent } from '@perses-dev/core';
-import { useState, useRef, useEffect } from 'react';
 import { produce } from 'immer';
+import { useState, useRef, useEffect } from 'react';
+
 import { PanelPlugin, PluginType } from '../../model';
+import { usePlugin, usePluginRegistry } from '../../runtime';
 import { PluginKindSelectProps } from '../PluginKindSelect/PluginKindSelect';
 import { PluginSpecEditorProps } from '../PluginSpecEditor/PluginSpecEditor';
-import { usePlugin, usePluginRegistry } from '../../runtime';
 
 export interface PluginEditorSelection {
   type: PluginType;

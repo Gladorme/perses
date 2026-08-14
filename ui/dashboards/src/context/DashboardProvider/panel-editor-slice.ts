@@ -13,6 +13,7 @@
 
 import { Action, PanelEditorValues, PanelGroupId } from '@perses-dev/core';
 import { StateCreator } from 'zustand';
+
 import { getYForNewRow } from '../../utils';
 import { generateId, Middleware, createPanelDefinition } from './common';
 import {

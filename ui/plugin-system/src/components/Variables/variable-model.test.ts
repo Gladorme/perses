@@ -11,8 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useAllVariableValues, usePlugin, VariableOption, VariableStateMap } from '@perses-dev/plugin-system';
 import { ListVariableDefinition } from '@perses-dev/core';
+import { useAllVariableValues, usePlugin, VariableOption, VariableStateMap } from '@perses-dev/plugin-system';
+
 import { renderHookWithContext } from '../../test/render-hook';
 import { filterVariableList, useListVariablePluginValues } from './variable-model';
 

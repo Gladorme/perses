@@ -11,13 +11,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Dispatch, DispatchWithoutAction, ReactElement } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextField } from '@mui/material';
 import { Dialog } from '@perses-dev/components';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { ProjectResource } from '@perses-dev/core';
+import { Dispatch, DispatchWithoutAction, ReactElement } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),

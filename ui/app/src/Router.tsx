@@ -18,7 +18,11 @@ import { CookiesProvider } from 'react-cookie';
 import { createBrowserRouter, Navigate, Outlet, RouterProvider, useLocation } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+
+// Default route is eagerly loaded
+import App from './App';
 import { PersesLoader } from './components/PersesLoader';
+import { PERSES_APP_CONFIG } from './config';
 import { AuthorizationProvider } from './context/Authorization';
 import {
   ConfigContextProvider,
@@ -42,9 +46,6 @@ import {
 import SignInView from './views/auth/SignInView';
 import SignUpView from './views/auth/SignUpView';
 import HomeView from './views/home/HomeView';
-// Default route is eagerly loaded
-import App from './App';
-import { PERSES_APP_CONFIG } from './config';
 
 // Other routes are lazy-loaded for code-splitting
 const ImportView = lazy(() => import('./views/import/ImportView'));

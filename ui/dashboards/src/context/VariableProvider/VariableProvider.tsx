@@ -11,22 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createContext, ReactElement, ReactNode, useContext, useMemo, useState } from 'react';
-import { createStore, StoreApi, useStore } from 'zustand';
-import { useStoreWithEqualityFn } from 'zustand/traditional';
-import { immer } from 'zustand/middleware/immer';
-import { devtools } from 'zustand/middleware';
-import { shallow } from 'zustand/shallow';
-import { produce } from 'immer';
-import {
-  VariableContext,
-  VariableStateMap,
-  VariableState,
-  VariableStoreStateMap,
-  VariableOption,
-  BuiltinVariableContext,
-  useTimeRange,
-} from '@perses-dev/plugin-system';
 import {
   DEFAULT_ALL_VALUE as ALL_VALUE,
   VariableName,
@@ -38,9 +22,26 @@ import {
   TextVariableDefinition,
   ListVariableDefinition,
 } from '@perses-dev/core';
-import { checkSavedDefaultVariableStatus, findVariableDefinitionByName, mergeVariableDefinitions } from './utils';
-import { hydrateVariableDefinitionStates as hydrateVariableDefinitionStates } from './hydrationUtils';
+import {
+  VariableContext,
+  VariableStateMap,
+  VariableState,
+  VariableStoreStateMap,
+  VariableOption,
+  BuiltinVariableContext,
+  useTimeRange,
+} from '@perses-dev/plugin-system';
+import { produce } from 'immer';
+import { createContext, ReactElement, ReactNode, useContext, useMemo, useState } from 'react';
+import { createStore, StoreApi, useStore } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import { shallow } from 'zustand/shallow';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
+
+import { hydrateVariableDefinitionStates } from './hydrationUtils';
 import { getInitalValuesFromQueryParameters, getURLQueryParamName, useVariableQueryParams } from './query-params';
+import { checkSavedDefaultVariableStatus, findVariableDefinitionByName, mergeVariableDefinitions } from './utils';
 
 /**
  * This store is used to manipulate and read the definition of the variables and their state.

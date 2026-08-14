@@ -11,6 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Stack } from '@mui/material';
+import { GridColDef, GridRowParams } from '@mui/x-data-grid';
+import { useSnackbar } from '@perses-dev/components';
 import {
   getResourceDisplayName,
   DashboardResource,
@@ -18,16 +21,15 @@ import {
   EphemeralDashboardInfo,
   getResourceExtendedDisplayName,
 } from '@perses-dev/core';
-import { Stack } from '@mui/material';
-import { GridColDef, GridRowParams } from '@mui/x-data-grid';
+import ContentCopyIcon from 'mdi-material-ui/ContentCopy';
 import DeleteIcon from 'mdi-material-ui/DeleteOutline';
 import PencilIcon from 'mdi-material-ui/Pencil';
 import { ReactElement, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ContentCopyIcon from 'mdi-material-ui/ContentCopy';
-import { useSnackbar } from '@perses-dev/components';
-import { CreateDashboardDialog, DeleteResourceDialog, RenameDashboardDialog } from '../dialogs';
+
+import { useDeleteDashboardMutation } from '../../model/dashboard-client';
 import { CRUDGridActionsCellItem } from '../CRUDButton/CRUDGridActionsCellItem';
+import { CreateDashboardDialog, DeleteResourceDialog, RenameDashboardDialog } from '../dialogs';
 import {
   CREATED_AT_COL_DEF,
   DISPLAY_NAME_COL_DEF,
@@ -36,7 +38,6 @@ import {
   UPDATED_AT_COL_DEF,
   VERSION_COL_DEF,
 } from '../list';
-import { useDeleteDashboardMutation } from '../../model/dashboard-client';
 import { DashboardDataGrid, Row } from './DashboardDataGrid';
 
 export interface DashboardListProperties extends ListProperties {
@@ -102,10 +103,8 @@ export function DashboardList(props: DashboardListProperties): ReactElement {
               spec: {
                 ...targetedDashboard.spec,
                 ttl: dashboardInfo.ttl,
-                ...{
-                  display: {
-                    name: dashboardInfo.dashboard,
-                  },
+                display: {
+                  name: dashboardInfo.dashboard,
                 },
               },
             },
@@ -116,10 +115,8 @@ export function DashboardList(props: DashboardListProperties): ReactElement {
               name: dashboardInfo.dashboard,
               spec: {
                 ...targetedDashboard.spec,
-                ...{
-                  display: {
-                    name: dashboardInfo.dashboard,
-                  },
+                display: {
+                  name: dashboardInfo.dashboard,
                 },
               },
             },

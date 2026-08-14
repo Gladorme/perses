@@ -17,7 +17,7 @@ Below is a list of notable tooling that is used throughout the Perses UI.
 - Development utilities
   - Monorepo management: [turborepo](https://turbo.build/)
   - Code compiling: [swc](https://swc.rs/) (used for libraries), [webpack](https://webpack.js.org/) (used for applications)
-  - Code linting/formatting: [eslint](https://eslint.org/), [prettier](https://prettier.io/)
+  - Code linting/formatting: [Oxlint](https://oxc.rs/docs/guide/usage/linter.html), [Oxfmt](https://oxc.rs/docs/guide/usage/formatter.html)
   - Language: [TypeScript](https://www.typescriptlang.org/) (with a few exceptions for things like config files)
   - Package manager: [npm](https://docs.npmjs.com/) with [workspaces](https://docs.npmjs.com/cli/v7/using-npm/workspaces)
 - Core UI and component libraries
@@ -105,13 +105,14 @@ are reflected in how the packages are organized. There is some variability from 
 
 ### All packages
 
-- Eslint enforces certain style and correctness rules to help avoid common coding pitfalls and maintain consistency.
-  - Exceptions can be made on a case-by-case basis using `eslint-disable-next-line` and a comment that communicates the reason for the exception.
-  - We prefer `error` (instead of `warn`) for eslint rules because it makes it easier to catch and enforce linting issues.
+- Oxlint enforces certain style and correctness rules to help avoid common coding pitfalls and maintain consistency.
+  - Exceptions can be made on a case-by-case basis using `oxlint-disable-next-line` and a comment that communicates the reason for the exception.
+  - Correctness and established project rules use `error`. Newly enabled React performance and compiler checks use
+    `warn` while the existing findings are worked down; CI's warning budget prevents the baseline from growing.
 - Typescript is used to provide a stronger guarantee of correctness across the
   application. Please avoid using escape hatches like `any`, prefer using `unknown`
   and type narrowing instead.
-- Prettier is auto formatting all code to avoid bikeshedding on basic stylistic
+- Oxfmt is auto formatting all code to avoid bikeshedding on basic stylistic
   concerns
 
 ### Application

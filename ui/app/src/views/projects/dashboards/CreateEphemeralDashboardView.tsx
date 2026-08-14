@@ -11,7 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useSnackbar } from '@perses-dev/components';
 import {
   EphemeralDashboardResource,
@@ -23,6 +22,8 @@ import {
   DurationString,
 } from '@perses-dev/core';
 import { ReactElement, useCallback } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+
 import { useCreateEphemeralDashboardMutation } from '../../../model/ephemeral-dashboard-client';
 import { generateMetadataName } from '../../../utils/metadata';
 import { HelperDashboardView } from './HelperDashboardView';

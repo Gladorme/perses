@@ -22,10 +22,11 @@ import {
   Typography,
   Grid2 as Grid,
 } from '@mui/material';
+import { ValueMapping } from '@perses-dev/core';
 import DeleteIcon from 'mdi-material-ui/DeleteOutline';
 import PlusIcon from 'mdi-material-ui/Plus';
-import { ValueMapping } from '@perses-dev/core';
 import { FC } from 'react';
+
 import { OptionsColorPicker } from '../ColorPicker/OptionsColorPicker';
 
 interface ValueMappingConditionEditorProps extends Omit<StackProps, 'onChange'> {

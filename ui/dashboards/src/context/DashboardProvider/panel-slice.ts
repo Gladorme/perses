@@ -13,6 +13,7 @@
 
 import { PanelDefinition } from '@perses-dev/core';
 import { StateCreator } from 'zustand';
+
 import { Middleware } from './common';
 
 /**

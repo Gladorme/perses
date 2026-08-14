@@ -11,8 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useCallback, useMemo, useState } from 'react';
 import { Definition, Link, PanelDefinition, QueryDefinition, UnknownSpec } from '@perses-dev/core';
+import { useCallback, useMemo, useState } from 'react';
 
 interface UsePanelEditorResult {
   setName: (value: string) => void;

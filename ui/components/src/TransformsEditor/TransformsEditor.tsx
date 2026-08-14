@@ -11,10 +11,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Transform } from '@perses-dev/core';
 import { Button, Stack, StackProps } from '@mui/material';
-import { ReactElement, useState } from 'react';
+import { Transform } from '@perses-dev/core';
 import AddIcon from 'mdi-material-ui/Plus';
+import { ReactElement, useState } from 'react';
+
 import { TransformEditorContainer } from './TransformEditorContainer';
 
 export interface TransformsEditorProps extends Omit<StackProps, 'onChange'> {

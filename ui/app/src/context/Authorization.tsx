@@ -11,12 +11,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { createContext, ReactElement, ReactNode, useContext, useMemo } from 'react';
 import { Action, Permission, ProjectResource, Scope } from '@perses-dev/core';
+import React, { createContext, ReactElement, ReactNode, useContext, useMemo } from 'react';
+
 import { useAuthToken } from '../model/auth-client';
-import { useUserPermissions } from '../model/user-client';
-import { useProjectList } from '../model/project-client';
 import { enableRefreshFetch } from '../model/fetch';
+import { useProjectList } from '../model/project-client';
+import { useUserPermissions } from '../model/user-client';
 import { useIsAuthEnabled } from './Config';
 
 // Used as placeholder for checking Global permissions

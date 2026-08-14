@@ -11,11 +11,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { forwardRef, memo, MouseEvent, MouseEventHandler, ReactElement, useState } from 'react';
 import { Box, ListItemText, ListItemProps, ListItemButton } from '@mui/material';
+import { forwardRef, memo, MouseEvent, MouseEventHandler, ReactElement, useState } from 'react';
+
 import { combineSx } from '../utils';
-import { LegendColorBadge } from './LegendColorBadge';
 import { LegendItem } from './legend-model';
+import { LegendColorBadge } from './LegendColorBadge';
 
 export type LegendItemEventOpts = {
   /**
@@ -77,6 +78,8 @@ const ListLegendItemBase = forwardRef<HTMLDivElement, ListLegendItemProps>(funct
     item.onClick?.(e);
   };
 
+  // ListItemButton must remain the measured and interactive element while exposing its position in the surrounding list.
+  /* oxlint-disable jsx-a11y/prefer-tag-over-role */
   return (
     <ListItemButton
       {...others}
@@ -106,6 +109,7 @@ const ListLegendItemBase = forwardRef<HTMLDivElement, ListLegendItemProps>(funct
       ></ListItemText>
     </ListItemButton>
   );
+  /* oxlint-enable jsx-a11y/prefer-tag-over-role */
 });
 
 export const ListLegendItem = memo(ListLegendItemBase);

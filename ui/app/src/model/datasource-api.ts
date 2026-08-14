@@ -14,6 +14,7 @@
 import { DatasourceSelector } from '@perses-dev/core';
 import { DatasourceApi } from '@perses-dev/dashboards';
 import { useCallback } from 'react';
+
 import { PERSES_APP_CONFIG } from '../config';
 import { useDatasourceList } from './datasource-client';
 import { useGlobalDatasourceList } from './global-datasource-client';

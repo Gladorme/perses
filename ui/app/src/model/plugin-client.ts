@@ -14,6 +14,7 @@
 import { StatusError, fetchJson } from '@perses-dev/core';
 import { PluginModuleResource } from '@perses-dev/plugin-system';
 import { UseQueryOptions, UseQueryResult, useQuery } from '@tanstack/react-query';
+
 import buildURL from './url-builder';
 
 const resource = 'plugins';

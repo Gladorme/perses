@@ -21,13 +21,14 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import buildURL from './url-builder';
-import { HTTPHeader, HTTPMethodDELETE, HTTPMethodGET, HTTPMethodPOST, HTTPMethodPUT } from './http';
+
 import { resource as dashboardResource, useDashboardList } from './dashboard-client';
-import { resource as variableResource } from './variable-client';
 import { resource as datasourceResource } from './datasource-client';
+import { HTTPHeader, HTTPMethodDELETE, HTTPMethodGET, HTTPMethodPOST, HTTPMethodPUT } from './http';
 import buildQueryKey from './querykey-builder';
+import buildURL from './url-builder';
 import { userKey } from './user-client';
+import { resource as variableResource } from './variable-client';
 
 const resource = 'projects';
 

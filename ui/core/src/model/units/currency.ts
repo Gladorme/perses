@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { toUpper } from 'lodash';
+
 import { MAX_SIGNIFICANT_DIGITS } from './constants';
 import { UnitConfig, UnitGroupConfig } from './types';
 import { hasDecimalPlaces, limitDecimalPlaces } from './utils';

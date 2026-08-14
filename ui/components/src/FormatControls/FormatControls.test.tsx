@@ -11,9 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { FormatOptions } from '@perses-dev/core';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FormatOptions } from '@perses-dev/core';
+
 import { FormatControls } from './FormatControls';
 
 describe('FormatControls', () => {

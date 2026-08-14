@@ -11,9 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { DashboardResource } from '@perses-dev/core';
 import { ConsoleMessage, test as testBase, expect } from '@playwright/test';
 import fetch from 'node-fetch';
-import { DashboardResource } from '@perses-dev/core';
+
 import { AppHomePage, DashboardPage } from '../pages';
 
 type DashboardTestOptions = {
@@ -146,7 +147,7 @@ export const test = testBase.extend<DashboardTestOptions & DashboardTestFixtures
   ignoresConsoleErrors: [],
   dashboardPage: async (
     { page, projectName, dashboardName, modifiesDashboard, mockNow, ignoresConsoleErrors },
-    use,
+    provideDashboardPage,
     testInfo
   ) => {
     let testDashboardName: string = dashboardName;
@@ -177,7 +178,7 @@ export const test = testBase.extend<DashboardTestOptions & DashboardTestFixtures
     const dashboardPage = new DashboardPage(page);
 
     // Use the fixture value in the test.
-    await use(dashboardPage);
+    await provideDashboardPage(dashboardPage);
 
     await dashboardPage.cleanupMockRequests();
 

@@ -15,16 +15,17 @@ import { Typography, Stack, Button, Box, useTheme, useMediaQuery, Alert } from '
 import { ErrorBoundary, ErrorAlert } from '@perses-dev/components';
 import { TimeRangeControls } from '@perses-dev/plugin-system';
 import { ReactElement, ReactNode } from 'react';
+
 import { OnSaveDashboard, useEditMode } from '../../context';
-import { AddPanelButton } from '../AddPanelButton';
 import { AddGroupButton } from '../AddGroupButton';
-import { DownloadButton } from '../DownloadButton';
-import { EditVariablesButton } from '../Variables';
+import { AddPanelButton } from '../AddPanelButton';
+import { DashboardStickyToolbar } from '../DashboardStickyToolbar';
 import { EditDatasourcesButton } from '../Datasources';
+import { DownloadButton } from '../DownloadButton';
 import { EditButton } from '../EditButton';
 import { EditJsonButton } from '../EditJsonButton';
 import { SaveDashboardButton } from '../SaveDashboardButton';
-import { DashboardStickyToolbar } from '../DashboardStickyToolbar';
+import { EditVariablesButton } from '../Variables';
 
 export interface DashboardToolbarProps {
   dashboardName: string;

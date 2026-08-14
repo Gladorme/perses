@@ -11,7 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useState, useMemo, ReactElement } from 'react';
 import {
   Button,
   Stack,
@@ -33,17 +32,8 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
-import AddIcon from 'mdi-material-ui/Plus';
+import { InfoTooltip } from '@perses-dev/components';
 import { Action, BuiltinVariableDefinition, DEFAULT_DASHBOARD_DURATION, VariableDefinition } from '@perses-dev/core';
-import { useImmer } from 'use-immer';
-import PencilIcon from 'mdi-material-ui/Pencil';
-import TrashIcon from 'mdi-material-ui/TrashCan';
-import ArrowUp from 'mdi-material-ui/ArrowUp';
-import ArrowDown from 'mdi-material-ui/ArrowDown';
-import ContentDuplicate from 'mdi-material-ui/ContentDuplicate';
-import OpenInNewIcon from 'mdi-material-ui/OpenInNew';
-import ExpandMoreIcon from 'mdi-material-ui/ChevronUp';
-
 import {
   ValidationProvider,
   VariableEditorForm,
@@ -52,7 +42,17 @@ import {
   useInitialTimeRange,
   TimeRangeProvider,
 } from '@perses-dev/plugin-system';
-import { InfoTooltip } from '@perses-dev/components';
+import ArrowDown from 'mdi-material-ui/ArrowDown';
+import ArrowUp from 'mdi-material-ui/ArrowUp';
+import ExpandMoreIcon from 'mdi-material-ui/ChevronUp';
+import ContentDuplicate from 'mdi-material-ui/ContentDuplicate';
+import OpenInNewIcon from 'mdi-material-ui/OpenInNew';
+import PencilIcon from 'mdi-material-ui/Pencil';
+import AddIcon from 'mdi-material-ui/Plus';
+import TrashIcon from 'mdi-material-ui/TrashCan';
+import { useState, useMemo, ReactElement } from 'react';
+import { useImmer } from 'use-immer';
+
 import { ExternalVariableDefinition, useDashboard, useDiscardChangesConfirmationDialog } from '../../context';
 import { hydrateVariableDefinitionStates } from '../../context/VariableProvider/hydrationUtils';
 import { BuiltinVariableAccordions } from './BuiltinVariableAccordions';

@@ -12,12 +12,12 @@
 // limitations under the License.
 
 import { DatasourceSpec } from './datasource';
+import { Display } from './display';
 import { LayoutDefinition } from './layout';
 import { PanelDefinition } from './panels';
 import { ProjectMetadata } from './resource';
 import { DurationString } from './time';
 import { VariableDefinition } from './variables';
-import { Display } from './display';
 
 export interface DashboardResource {
   kind: 'Dashboard';

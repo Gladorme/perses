@@ -1,3 +1,5 @@
+import { PanelGroupId } from '@perses-dev/core';
+import { useVariableValues, VariableContext } from '@perses-dev/plugin-system';
 // Copyright 2023 The Perses Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +14,8 @@
 // limitations under the License.
 import { ReactElement, useState } from 'react';
 import { Layouts, Layout } from 'react-grid-layout';
-import { PanelGroupId } from '@perses-dev/core';
-import { useVariableValues, VariableContext } from '@perses-dev/plugin-system';
+
+import { GRID_LAYOUT_SMALL_BREAKPOINT } from '../../constants';
 import {
   useEditMode,
   usePanelGroup,
@@ -21,7 +23,6 @@ import {
   useViewPanelGroup,
   PanelGroupDefinition,
 } from '../../context';
-import { GRID_LAYOUT_SMALL_BREAKPOINT } from '../../constants';
 import { PanelOptions } from '../Panel';
 import { Row, RowProps } from './Row';
 

@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { FormatOptions } from '@perses-dev/core';
+
 import { EChartsDataFormat } from '../model';
 import { legacyCheckforNearbySeries, getYBuffer, isWithinPercentageRange } from './nearby-series';
 

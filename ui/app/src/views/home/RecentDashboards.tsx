@@ -12,9 +12,10 @@
 // limitations under the License.
 
 import { Card, Stack } from '@mui/material';
+import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
 import HistoryIcon from 'mdi-material-ui/History';
 import { ReactElement } from 'react';
-import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
+
 import { RecentDashboardList } from '../../components/DashboardList/RecentDashboardList';
 import { useRecentDashboardList } from '../../model/dashboard-client';
 

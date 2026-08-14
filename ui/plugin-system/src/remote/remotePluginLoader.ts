@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { PluginLoader, PluginMetadata, PluginModuleResource } from '@perses-dev/plugin-system';
+
 import { RemotePluginModule } from './PersesPlugin.types';
 import { loadPlugin } from './PluginRuntime';
 

@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { LegendOptionsBase } from '@perses-dev/core';
+
 import { validateLegendSpec } from './legend';
 
 describe('validateLegendSpec', () => {

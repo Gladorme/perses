@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { StateCreator } from 'zustand';
+
 import { Middleware } from './common';
 import { PanelGroupSlice, PanelGroupItemId } from './panel-group-slice';
 import { PanelSlice } from './panel-slice';

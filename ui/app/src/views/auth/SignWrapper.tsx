@@ -12,11 +12,13 @@
 // limitations under the License.
 
 /* TODO: @Gladorme check social button types */
-/* eslint @typescript-eslint/explicit-function-return-type: 0 */
-/* typescript-eslint/explicit-module-boundary-types: 0 */
+/* oxlint-disable typescript/explicit-function-return-type */
 
 import { alpha, Divider, Stack, Theme, useTheme } from '@mui/material';
+import Bitbucket from 'mdi-material-ui/Bitbucket';
+import Gitlab from 'mdi-material-ui/Gitlab';
 import { ReactElement, ReactNode } from 'react';
+import * as React from 'react';
 import {
   AmazonLoginButton,
   AppleLoginButton,
@@ -39,16 +41,14 @@ import {
   YahooLoginButton,
   ZaloLoginButton,
 } from 'react-social-login-buttons';
-import * as React from 'react';
-import Gitlab from 'mdi-material-ui/Gitlab';
-import Bitbucket from 'mdi-material-ui/Bitbucket';
-import { useDarkMode } from '../../context/DarkMode';
-import PersesLogoCropped from '../../components/logo/PersesLogoCropped';
+
 import DarkThemePersesLogo from '../../components/logo/DarkThemePersesLogo';
 import LightThemePersesLogo from '../../components/logo/LightThemePersesLogo';
-import { useIsLaptopSize } from '../../utils/browser-size';
+import PersesLogoCropped from '../../components/logo/PersesLogoCropped';
 import { useConfigContext } from '../../context/Config';
+import { useDarkMode } from '../../context/DarkMode';
 import { buildRedirectQueryString, useRedirectQueryParam } from '../../model/auth-client';
+import { useIsLaptopSize } from '../../utils/browser-size';
 
 // A simple map to know which button to use, according to the configuration.
 // If the issuer/auth url contains the given key, this will use the corresponding button.
@@ -138,6 +138,10 @@ export function SignWrapper(props: { children: ReactNode }): ReactElement {
   const socialProviders = [...oidcProviders, ...oauthProviders];
   const nativeProviderIsEnabled = config.config?.security?.authentication?.providers?.enable_native;
   const path = useRedirectQueryParam();
+  let logo = <PersesLogoCropped />;
+  if (isLaptopSize) {
+    logo = isDarkModeEnabled ? <DarkThemePersesLogo /> : <LightThemePersesLogo />;
+  }
 
   return (
     <Stack
@@ -147,7 +151,7 @@ export function SignWrapper(props: { children: ReactNode }): ReactElement {
       justifyContent="center"
       gap={2}
     >
-      {!isLaptopSize ? <PersesLogoCropped /> : isDarkModeEnabled ? <DarkThemePersesLogo /> : <LightThemePersesLogo />}
+      {logo}
       <Divider
         orientation={isLaptopSize ? 'vertical' : 'horizontal'}
         variant="middle"

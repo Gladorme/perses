@@ -13,8 +13,9 @@
 
 import { DurationString, TimeRangeValue } from '@perses-dev/core';
 import React, { ReactElement } from 'react';
-import { TimeRangeProvider } from './TimeRangeProvider';
+
 import { useSetRefreshIntervalParams, useTimeRangeParams } from './query-params';
+import { TimeRangeProvider } from './TimeRangeProvider';
 
 export interface TimeRangeFromQueryProps {
   initialTimeRange: TimeRangeValue;

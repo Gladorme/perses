@@ -12,8 +12,8 @@
 // limitations under the License.
 
 import { Box, BoxProps } from '@mui/material';
-import { BuiltinVariableDefinition, DEFAULT_DASHBOARD_DURATION, DEFAULT_REFRESH_INTERVAL } from '@perses-dev/core';
 import { ErrorBoundary, ErrorAlert, combineSx } from '@perses-dev/components';
+import { BuiltinVariableDefinition, DEFAULT_DASHBOARD_DURATION, DEFAULT_REFRESH_INTERVAL } from '@perses-dev/core';
 import {
   TimeRangeProviderWithQueryParams,
   useInitialRefreshInterval,
@@ -21,6 +21,7 @@ import {
   usePluginBuiltinVariableDefinitions,
 } from '@perses-dev/plugin-system';
 import { ReactElement, useMemo } from 'react';
+
 import {
   DatasourceStoreProviderProps,
   DatasourceStoreProvider,

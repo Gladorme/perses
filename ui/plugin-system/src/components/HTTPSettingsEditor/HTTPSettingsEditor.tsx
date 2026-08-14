@@ -11,13 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { RequestHeaders, HTTPDatasourceSpec } from '@perses-dev/core';
 import { Grid, IconButton, MenuItem, TextField, Typography } from '@mui/material';
-import React, { Fragment, ReactElement, useState } from 'react';
+import { RequestHeaders, HTTPDatasourceSpec } from '@perses-dev/core';
 import { produce } from 'immer';
-import { Controller } from 'react-hook-form';
 import MinusIcon from 'mdi-material-ui/Minus';
 import PlusIcon from 'mdi-material-ui/Plus';
+import React, { Fragment, ReactElement, useState } from 'react';
+import { Controller } from 'react-hook-form';
+
 import { OptionsEditorRadios } from '../OptionsEditorRadios';
 
 export interface HTTPSettingsEditor {

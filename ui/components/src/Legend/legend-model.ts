@@ -11,8 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { MouseEventHandler } from 'react';
 import { LegendOptionsBase } from '@perses-dev/core';
+import { MouseEventHandler } from 'react';
 
 // This file contains legend-related model code specific to the legend component.
 // See the `core` package for common/shared legend model code and the

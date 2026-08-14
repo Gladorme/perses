@@ -11,15 +11,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Dispatch, DispatchWithoutAction, ReactElement } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextField } from '@mui/material';
 import { Dialog, useSnackbar } from '@perses-dev/components';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { getResourceDisplayName, ProjectResource } from '@perses-dev/core';
-import { CreateProjectValidationType, useProjectValidationSchema } from '../../validation';
-import { generateMetadataName } from '../../utils/metadata';
+import { Dispatch, DispatchWithoutAction, ReactElement } from 'react';
+import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+
 import { useCreateProjectMutation } from '../../model/project-client';
+import { generateMetadataName } from '../../utils/metadata';
+import { CreateProjectValidationType, useProjectValidationSchema } from '../../validation';
 
 interface CreateProjectDialogProps {
   open: boolean;

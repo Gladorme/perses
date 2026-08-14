@@ -22,10 +22,11 @@ import {
   useInitialTimeRange,
 } from '@perses-dev/plugin-system';
 import { ReactElement, useMemo, useState } from 'react';
+
 import { useDatasourceApi } from '../../model/datasource-api';
+import { useRemotePluginLoader } from '../../model/remote-plugin-loader';
 import { DeleteResourceDialog } from '../dialogs';
 import { DrawerProps } from '../form-drawers';
-import { useRemotePluginLoader } from '../../model/remote-plugin-loader';
 
 interface VariableDrawerProps<T extends Variable> extends DrawerProps<T> {
   variable: T;

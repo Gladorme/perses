@@ -11,14 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createContext, ReactElement, useCallback, useContext, useMemo } from 'react';
 import { QueryType, TimeSeriesQueryDefinition } from '@perses-dev/core';
+import { createContext, ReactElement, useCallback, useContext, useMemo } from 'react';
+
+import { LogQueryDefinition, useLogQueries } from '../log-queries';
+import { useProfileQueries, ProfileQueryDefinition } from '../profile-queries';
 import { useTimeSeriesQueries } from '../time-series-queries';
 import { useTraceQueries, TraceQueryDefinition } from '../trace-queries';
-import { useProfileQueries, ProfileQueryDefinition } from '../profile-queries';
-
 import { useUsageMetrics } from '../UsageMetricsProvider';
-import { LogQueryDefinition, useLogQueries } from '../log-queries';
 import {
   DataQueriesProviderProps,
   UseDataQueryResults,

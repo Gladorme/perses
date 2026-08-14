@@ -12,8 +12,8 @@
 // limitations under the License.
 
 import { VariableDefinition } from '@perses-dev/core';
-import { VariableStoreStateMap } from '@perses-dev/plugin-system';
 import { ExternalVariableDefinition } from '@perses-dev/dashboards';
+import { VariableStoreStateMap } from '@perses-dev/plugin-system';
 
 /*
  * Check whether saved variable definitions are out of date with current default list values in Zustand store

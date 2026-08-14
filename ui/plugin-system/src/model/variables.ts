@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { UnknownSpec, AbsoluteTimeRange } from '@perses-dev/core';
+
 import { VariableStateMap, DatasourceStore } from '../runtime';
 import { Plugin } from './plugin-base';
 

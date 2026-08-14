@@ -23,19 +23,20 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { ChangeEvent, MouseEvent, ReactElement, useCallback, useMemo, useState } from 'react';
-import { getResourceDisplayName, ProjectResource } from '@perses-dev/core';
-import { ErrorAlert, ErrorBoundary, useSnackbar } from '@perses-dev/components';
-import ChevronDown from 'mdi-material-ui/ChevronDown';
-import Archive from 'mdi-material-ui/Archive';
-import DeleteOutline from 'mdi-material-ui/DeleteOutline';
-import { Link as RouterLink } from 'react-router-dom';
 import { KVSearch } from '@nexucis/kvsearch';
+import { ErrorAlert, ErrorBoundary, useSnackbar } from '@perses-dev/components';
+import { getResourceDisplayName, ProjectResource } from '@perses-dev/core';
+import Archive from 'mdi-material-ui/Archive';
+import ChevronDown from 'mdi-material-ui/ChevronDown';
+import DeleteOutline from 'mdi-material-ui/DeleteOutline';
 import FormatListBulletedIcon from 'mdi-material-ui/FormatListBulleted';
+import { ChangeEvent, MouseEvent, ReactElement, useCallback, useMemo, useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+
 import { DashboardList } from '../../components/DashboardList/DashboardList';
-import { useIsEphemeralDashboardEnabled, useIsReadonly } from '../../context/Config';
-import { useHasPermission } from '../../context/Authorization';
 import { DeleteResourceDialog } from '../../components/dialogs';
+import { useHasPermission } from '../../context/Authorization';
+import { useIsEphemeralDashboardEnabled, useIsReadonly } from '../../context/Config';
 import { ProjectWithDashboards, useProjectsWithDashboards, useDeleteProjectMutation } from '../../model/project-client';
 
 interface ProjectAccordionProps {

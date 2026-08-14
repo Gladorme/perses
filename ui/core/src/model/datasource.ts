@@ -12,8 +12,8 @@
 // limitations under the License.
 
 import { Definition, UnknownSpec } from './definitions';
-import { Metadata, ProjectMetadata } from './resource';
 import { Display } from './display';
+import { Metadata, ProjectMetadata } from './resource';
 
 export interface DatasourceSpec<PluginSpec = UnknownSpec> {
   display?: Display;

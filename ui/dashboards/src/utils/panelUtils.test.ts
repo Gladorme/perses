@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { PanelDefinition } from '@perses-dev/core';
+
 import { PanelGroupItemLayout } from '../context';
 import { getValidPanelKey, insertPanelInLayout, UnpositionedPanelGroupItemLayout } from './panelUtils';
 

@@ -11,7 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ReactElement, MouseEvent } from 'react';
 import {
   Button,
   ButtonProps,
@@ -27,6 +26,8 @@ import {
   Theme,
 } from '@mui/material';
 import CloseIcon from 'mdi-material-ui/Close';
+import { ReactElement, MouseEvent } from 'react';
+
 import { combineSx } from '../utils';
 
 export interface DialogHeaderProps extends DialogTitleProps {

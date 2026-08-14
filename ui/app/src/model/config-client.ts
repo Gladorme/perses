@@ -11,9 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { DashboardSelector, DurationString, fetchJson, Permission, StatusError } from '@perses-dev/core';
+import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { Duration } from 'date-fns';
+
 import { PERSES_APP_CONFIG } from '../config';
 import buildURL from './url-builder';
 

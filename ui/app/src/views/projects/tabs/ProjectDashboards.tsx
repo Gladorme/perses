@@ -13,9 +13,10 @@
 
 import { Card, CardProps } from '@mui/material';
 import { ReactElement } from 'react';
-import { useDashboardList } from '../../../model/dashboard-client';
+
 import { DashboardList } from '../../../components/DashboardList/DashboardList';
 import { useIsEphemeralDashboardEnabled } from '../../../context/Config';
+import { useDashboardList } from '../../../model/dashboard-client';
 
 interface ProjectDashboardsProps extends CardProps {
   projectName: string;

@@ -11,20 +11,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Stack, Grid, CircularProgress } from '@mui/material';
-import React, { ReactElement, useState } from 'react';
+import { useSnackbar } from '@perses-dev/components';
+import { ProjectResource } from '@perses-dev/core';
 import DeleteOutline from 'mdi-material-ui/DeleteOutline';
 import PencilIcon from 'mdi-material-ui/Pencil';
-import { ProjectResource } from '@perses-dev/core';
-import { useSnackbar } from '@perses-dev/components';
-import { DeleteResourceDialog, RenameResourceDialog } from '../../components/dialogs';
+import React, { ReactElement, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import ProjectBreadcrumbs from '../../components/breadcrumbs/ProjectBreadcrumbs';
 import { CRUDButton } from '../../components/CRUDButton/CRUDButton';
-import { useIsMobileSize } from '../../utils/browser-size';
+import { DeleteResourceDialog, RenameResourceDialog } from '../../components/dialogs';
 import { useDeleteProjectMutation, useProject, useUpdateProjectMutation } from '../../model/project-client';
-import { RecentlyViewedDashboards } from './RecentlyViewedDashboards';
+import { useIsMobileSize } from '../../utils/browser-size';
 import { ProjectTabs } from './ProjectTabs';
+import { RecentlyViewedDashboards } from './RecentlyViewedDashboards';
 
 function ProjectView(): ReactElement {
   const { projectName, tab } = useParams();

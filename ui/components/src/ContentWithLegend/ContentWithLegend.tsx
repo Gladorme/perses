@@ -11,9 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ReactElement } from 'react';
 import { Box, useTheme } from '@mui/material';
 import { getLegendSize } from '@perses-dev/core';
+import { ReactElement } from 'react';
+
 import { Legend } from '../Legend';
 import { ContentWithLegendProps, getContentWithLegendLayout } from './model/content-with-legend-model';
 

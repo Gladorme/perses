@@ -12,9 +12,10 @@
 // limitations under the License.
 
 import { Card } from '@mui/material';
-import { ReactElement, useCallback } from 'react';
-import { GlobalRoleResource, Role } from '@perses-dev/core';
 import { useSnackbar } from '@perses-dev/components';
+import { GlobalRoleResource, Role } from '@perses-dev/core';
+import { ReactElement, useCallback } from 'react';
+
 import { RoleList } from '../../../components/roles/RoleList';
 import {
   useCreateGlobalRoleMutation,

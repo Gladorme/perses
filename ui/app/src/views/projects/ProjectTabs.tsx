@@ -12,13 +12,7 @@
 // limitations under the License.
 
 import { Box, BoxProps, Stack } from '@mui/material';
-import { ReactElement, SyntheticEvent, useCallback, useMemo, useState } from 'react';
-import ViewDashboardIcon from 'mdi-material-ui/ViewDashboard';
-import CodeJsonIcon from 'mdi-material-ui/CodeJson';
-import DatabaseIcon from 'mdi-material-ui/Database';
-import ShieldIcon from 'mdi-material-ui/Shield';
-import ShieldAccountIcon from 'mdi-material-ui/ShieldAccount';
-import KeyIcon from 'mdi-material-ui/Key';
+import { useSnackbar } from '@perses-dev/components';
 import {
   getResourceDisplayName,
   getResourceExtendedDisplayName,
@@ -29,14 +23,24 @@ import {
   RoleBindingResource,
   SecretResource,
 } from '@perses-dev/core';
+import CodeJsonIcon from 'mdi-material-ui/CodeJson';
+import DatabaseIcon from 'mdi-material-ui/Database';
+import KeyIcon from 'mdi-material-ui/Key';
+import ShieldIcon from 'mdi-material-ui/Shield';
+import ShieldAccountIcon from 'mdi-material-ui/ShieldAccount';
+import ViewDashboardIcon from 'mdi-material-ui/ViewDashboard';
+import { ReactElement, SyntheticEvent, useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useSnackbar } from '@perses-dev/components';
+
 import { CRUDButton, CRUDButtonProps } from '../../components/CRUDButton/CRUDButton';
-import { CreateDashboardDialog } from '../../components/dialogs';
-import { VariableDrawer } from '../../components/variable/VariableDrawer';
 import { DatasourceDrawer } from '../../components/datasource/DatasourceDrawer';
-import { useCreateDatasourceMutation } from '../../model/datasource-client';
-import { useCreateVariableMutation } from '../../model/variable-client';
+import { CreateDashboardDialog } from '../../components/dialogs';
+import { RoleBindingDrawer } from '../../components/rolebindings/RoleBindingDrawer';
+import { RoleDrawer } from '../../components/roles/RoleDrawer';
+import { SecretDrawer } from '../../components/secrets/SecretDrawer';
+import { MenuTab, MenuTabs } from '../../components/tabs';
+import { VariableDrawer } from '../../components/variable/VariableDrawer';
+import { useHasPermission } from '../../context/Authorization';
 import {
   useIsAuthEnabled,
   useIsEphemeralDashboardEnabled,
@@ -44,23 +48,20 @@ import {
   useIsProjectVariableEnabled,
   useIsReadonly,
 } from '../../context/Config';
-import { MenuTab, MenuTabs } from '../../components/tabs';
-import { useCreateRoleBindingMutation } from '../../model/rolebinding-client';
-import { useCreateRoleMutation, useRoleList } from '../../model/role-client';
-import { RoleDrawer } from '../../components/roles/RoleDrawer';
-import { RoleBindingDrawer } from '../../components/rolebindings/RoleBindingDrawer';
-import { useIsMobileSize } from '../../utils/browser-size';
-import { SecretDrawer } from '../../components/secrets/SecretDrawer';
-import { useCreateSecretMutation } from '../../model/secret-client';
+import { useCreateDatasourceMutation } from '../../model/datasource-client';
 import { useEphemeralDashboardList } from '../../model/ephemeral-dashboard-client';
-import { useHasPermission } from '../../context/Authorization';
+import { useCreateRoleMutation, useRoleList } from '../../model/role-client';
+import { useCreateRoleBindingMutation } from '../../model/rolebinding-client';
+import { useCreateSecretMutation } from '../../model/secret-client';
+import { useCreateVariableMutation } from '../../model/variable-client';
+import { useIsMobileSize } from '../../utils/browser-size';
 import { ProjectDashboards } from './tabs/ProjectDashboards';
-import { ProjectEphemeralDashboards } from './tabs/ProjectEphemeralDashboards';
-import { ProjectVariables } from './tabs/ProjectVariables';
 import { ProjectDatasources } from './tabs/ProjectDatasources';
-import { ProjectSecrets } from './tabs/ProjectSecrets';
-import { ProjectRoles } from './tabs/ProjectRoles';
+import { ProjectEphemeralDashboards } from './tabs/ProjectEphemeralDashboards';
 import { ProjectRoleBindings } from './tabs/ProjectRoleBindings';
+import { ProjectRoles } from './tabs/ProjectRoles';
+import { ProjectSecrets } from './tabs/ProjectSecrets';
+import { ProjectVariables } from './tabs/ProjectVariables';
 
 const dashboardsTabIndex = 'dashboards';
 const ephemeralDashboardsTabIndex = 'ephemeraldashboards';

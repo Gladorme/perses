@@ -12,13 +12,14 @@
 // limitations under the License.
 
 import { CircularProgress, Stack } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useSnackbar } from '@perses-dev/components';
 import { DashboardResource, EphemeralDashboardResource, getResourceExtendedDisplayName } from '@perses-dev/core';
 import { ReactElement, useCallback, useEffect } from 'react';
-import { useEphemeralDashboard, useUpdateEphemeralDashboardMutation } from '../../../model/ephemeral-dashboard-client';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import { useIsReadonly } from '../../../context/Config';
 import { useNavHistoryDispatch } from '../../../context/DashboardNavHistory';
+import { useEphemeralDashboard, useUpdateEphemeralDashboardMutation } from '../../../model/ephemeral-dashboard-client';
 import { HelperDashboardView } from './HelperDashboardView';
 
 /**

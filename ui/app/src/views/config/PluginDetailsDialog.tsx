@@ -11,9 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { PluginModuleResource } from '@perses-dev/plugin-system';
 import { DialogContent, DialogTitle, Divider, List, ListItem, ListItemText, Stack, Typography } from '@mui/material';
 import { Dialog } from '@perses-dev/components';
+import { PluginModuleResource } from '@perses-dev/plugin-system';
 import { Fragment, ReactElement } from 'react';
 
 interface PluginDetailsDialogProps {

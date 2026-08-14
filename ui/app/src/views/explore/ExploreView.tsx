@@ -11,17 +11,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Compass from 'mdi-material-ui/Compass';
-import React, { ReactElement, useMemo } from 'react';
-import { PluginRegistry } from '@perses-dev/plugin-system';
-import { ExternalVariableDefinition } from '@perses-dev/dashboards';
 import { CircularProgress, Stack } from '@mui/material';
 import { ErrorAlert, ErrorBoundary } from '@perses-dev/components';
+import { ExternalVariableDefinition } from '@perses-dev/dashboards';
 import { ViewExplore } from '@perses-dev/explore';
+import { PluginRegistry } from '@perses-dev/plugin-system';
+import Compass from 'mdi-material-ui/Compass';
+import React, { ReactElement, useMemo } from 'react';
+
 import AppBreadcrumbs from '../../components/breadcrumbs/AppBreadcrumbs';
 import { useDatasourceApi } from '../../model/datasource-api';
-import { useRemotePluginLoader } from '../../model/remote-plugin-loader';
 import { useGlobalVariableList } from '../../model/global-variable-client';
+import { useRemotePluginLoader } from '../../model/remote-plugin-loader';
 import { buildGlobalVariableDefinition } from '../../utils/variables';
 
 function ExploreView(): ReactElement {

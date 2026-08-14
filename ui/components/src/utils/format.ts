@@ -11,8 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { formatInTimeZone } from 'date-fns-tz';
 import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
 export function dateFormatOptionsWithTimeZone(
   dateFormatOptions: Intl.DateTimeFormatOptions,

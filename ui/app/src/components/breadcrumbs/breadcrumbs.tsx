@@ -12,8 +12,8 @@
 // limitations under the License.
 
 import { Breadcrumbs as MUIBreadcrumbs, Link, styled, Stack, Typography } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 import { ReactElement } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 
 const BREADCRUMB_HEIGHT = '35px';
 

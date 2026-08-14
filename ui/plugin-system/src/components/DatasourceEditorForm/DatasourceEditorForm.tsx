@@ -17,6 +17,7 @@ import { DiscardChangesConfirmationDialog, FormActions } from '@perses-dev/compo
 import { Action, DatasourceDefinition } from '@perses-dev/core';
 import { DispatchWithoutAction, ReactElement, useState } from 'react';
 import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+
 import { useValidationSchemas } from '../../context';
 import { getSubmitText, getTitleAction } from '../../utils';
 import { PluginEditor } from '../PluginEditor';

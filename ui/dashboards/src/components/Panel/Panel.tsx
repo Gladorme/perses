@@ -17,6 +17,7 @@ import { PanelDefinition } from '@perses-dev/core';
 import { useDataQueriesContext, usePluginRegistry } from '@perses-dev/plugin-system';
 import { ReactNode, memo, useMemo, useState, useEffect } from 'react';
 import useResizeObserver from 'use-resize-observer';
+
 import { PanelGroupItemId } from '../../context';
 import { PanelContent } from './PanelContent';
 import { PanelHeader, PanelHeaderProps } from './PanelHeader';

@@ -14,6 +14,7 @@
 import { Definition, QueryDefinition, UnknownSpec, QueryDataType } from '@perses-dev/core';
 import { QueryObserverOptions, UseQueryResult } from '@tanstack/react-query';
 import { ReactNode, useCallback, useMemo } from 'react';
+
 import { useListPluginMetadata } from '../plugin-registry';
 
 export type QueryOptions = Record<string, unknown>;

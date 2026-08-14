@@ -11,9 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { DEFAULT_DASHBOARD_DURATION } from '@perses-dev/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactNode } from 'react';
-import { DEFAULT_DASHBOARD_DURATION } from '@perses-dev/core';
+
 import { PluginRegistry } from '../components';
 import { DefaultPluginKinds } from '../model';
 import { TimeRangeProvider } from '../runtime';

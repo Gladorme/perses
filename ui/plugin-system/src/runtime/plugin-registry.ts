@@ -14,6 +14,7 @@
 import { BuiltinVariableDefinition } from '@perses-dev/core';
 import { useQueries, useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
+
 import { DefaultPluginKinds, PluginImplementation, PluginMetadataWithModule, PluginType } from '../model';
 
 export interface PluginRegistryContextType {

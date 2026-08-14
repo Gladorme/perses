@@ -12,13 +12,14 @@
 // limitations under the License.
 
 import { Divider, IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import ChevronRight from 'mdi-material-ui/ChevronRight';
+import { Transform, TRANSFORM_TEXT } from '@perses-dev/core';
 import ChevronDown from 'mdi-material-ui/ChevronDown';
+import ChevronRight from 'mdi-material-ui/ChevronRight';
+import DeleteIcon from 'mdi-material-ui/DeleteOutline';
 import EyeOffIcon from 'mdi-material-ui/EyeOffOutline';
 import EyeIcon from 'mdi-material-ui/EyeOutline';
-import DeleteIcon from 'mdi-material-ui/DeleteOutline';
-import { Transform, TRANSFORM_TEXT } from '@perses-dev/core';
 import { ReactElement } from 'react';
+
 import { TransformEditor, TransformEditorProps } from './TransformEditor';
 
 export interface TransformEditorContainerProps extends TransformEditorProps {

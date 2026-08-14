@@ -18,6 +18,7 @@ import {
   GridDefinition,
   PanelGroupId,
 } from '@perses-dev/core';
+
 import { PanelGroupDefinition, useDashboardStore } from './DashboardProvider';
 import { useVariableDefinitionActions, useVariableDefinitions } from './VariableProvider';
 

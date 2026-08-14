@@ -11,11 +11,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { forwardRef, ReactElement, useState } from 'react';
-import { produce } from 'immer';
 import { Button, Stack } from '@mui/material';
-import AddIcon from 'mdi-material-ui/Plus';
 import { QueryDefinition, QueryPluginType } from '@perses-dev/core';
+import { produce } from 'immer';
+import AddIcon from 'mdi-material-ui/Plus';
+import { forwardRef, ReactElement, useState } from 'react';
+
 import { useListPluginMetadata, usePlugin, usePluginRegistry } from '../../runtime';
 import { PluginEditorRef } from '../PluginEditor';
 import { QueryEditorContainer } from './QueryEditorContainer';
@@ -123,11 +124,10 @@ export const MultiQueryEditor = forwardRef<PluginEditorRef, MultiQueryEditorProp
   };
 
   // show one query input if queries is empty
-  const queryDefinitions: QueryDefinition[] = queries.length
-    ? queries
-    : !isLoading
-      ? [defaultInitialQueryDefinition]
-      : [];
+  let queryDefinitions: QueryDefinition[] = queries;
+  if (!queries.length) {
+    queryDefinitions = isLoading ? [] : [defaultInitialQueryDefinition];
+  }
 
   return (
     <>

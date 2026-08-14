@@ -12,10 +12,10 @@
 // limitations under the License.
 
 import { Button, Divider, Stack, Typography, Grid2 as Grid } from '@mui/material';
-
-import { FC, useState } from 'react';
-import AddIcon from 'mdi-material-ui/Plus';
 import { ValueMapping } from '@perses-dev/core';
+import AddIcon from 'mdi-material-ui/Plus';
+import { FC, useState } from 'react';
+
 import { ValueMappingEditor } from './ValueMappingEditor';
 
 export interface ValueMappingsEditorProps {

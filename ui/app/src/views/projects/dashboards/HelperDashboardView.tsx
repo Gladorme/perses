@@ -17,15 +17,16 @@ import { DashboardResource, EphemeralDashboardResource, getResourceDisplayName }
 import { ExternalVariableDefinition, OnSaveDashboard, ViewDashboard } from '@perses-dev/dashboards';
 import { PluginRegistry, UsageMetricsProvider, ValidationProvider } from '@perses-dev/plugin-system';
 import { ReactElement, useMemo } from 'react';
+
 import ProjectBreadcrumbs from '../../../components/breadcrumbs/ProjectBreadcrumbs';
+import { PERSES_APP_CONFIG } from '../../../config';
+import { useIsLocalDatasourceEnabled, useIsLocalVariableEnabled } from '../../../context/Config';
 import { useDatasourceApi } from '../../../model/datasource-api';
 import { useGlobalVariableList } from '../../../model/global-variable-client';
 import { useProject } from '../../../model/project-client';
+import { useRemotePluginLoader } from '../../../model/remote-plugin-loader';
 import { useVariableList } from '../../../model/variable-client';
 import { buildGlobalVariableDefinition, buildProjectVariableDefinition } from '../../../utils/variables';
-import { useIsLocalDatasourceEnabled, useIsLocalVariableEnabled } from '../../../context/Config';
-import { useRemotePluginLoader } from '../../../model/remote-plugin-loader';
-import { PERSES_APP_CONFIG } from '../../../config';
 
 export interface GenericDashboardViewProps {
   dashboardResource: DashboardResource | EphemeralDashboardResource;

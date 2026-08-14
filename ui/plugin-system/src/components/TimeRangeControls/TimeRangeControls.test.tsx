@@ -11,13 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import userEvent from '@testing-library/user-event';
-import { screen, RenderOptions, render, RenderResult } from '@testing-library/react';
-import { DurationString } from '@perses-dev/core';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React, { ReactElement } from 'react';
 import { SnackbarProvider } from '@perses-dev/components';
+import { DurationString } from '@perses-dev/core';
 import { TimeRangeProvider, TimeRangeProviderWithQueryParams } from '@perses-dev/plugin-system';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { screen, RenderOptions, render, RenderResult } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React, { ReactElement } from 'react';
+
 import { TimeRangeControls } from './TimeRangeControls';
 
 /**

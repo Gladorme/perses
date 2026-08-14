@@ -16,9 +16,10 @@ import { combineSx } from '@perses-dev/components';
 import { Link } from '@perses-dev/core';
 import { QueryData, useReplaceVariablesInString } from '@perses-dev/plugin-system';
 import { ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
+
 import { HEADER_ACTIONS_CONTAINER_NAME } from '../../constants';
-import { PanelActions, PanelActionsProps } from './PanelActions';
 import { PanelOptions } from './Panel';
+import { PanelActions, PanelActionsProps } from './PanelActions';
 
 type OmittedProps = 'children' | 'action' | 'title' | 'disableTypography';
 

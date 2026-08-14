@@ -13,6 +13,7 @@
 
 import { fetchJson, StatusError } from '@perses-dev/core';
 import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+
 import buildURL from './url-builder';
 
 const resource = 'health';

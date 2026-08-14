@@ -13,6 +13,7 @@
 
 import { Theme } from '@mui/material';
 import { LegendPositions, getLegendMode, LegendSize } from '@perses-dev/core';
+
 import { LegendProps } from '../../Legend';
 import { getTableCellLayout } from '../../Table';
 
@@ -71,8 +72,9 @@ export interface ContentWithLegendProps {
   minChildrenHeight?: number;
 }
 
-export interface ContentWithLegendLayoutOpts
-  extends Required<Omit<ContentWithLegendProps, 'children' | 'legendProps'>> {
+export interface ContentWithLegendLayoutOpts extends Required<
+  Omit<ContentWithLegendProps, 'children' | 'legendProps'>
+> {
   legendProps?: ContentWithLegendProps['legendProps'];
   theme: Theme;
 }

@@ -12,8 +12,8 @@
 // limitations under the License.
 
 import { Button, Divider, Stack, StackProps } from '@mui/material';
-import { ReactElement } from 'react';
 import { Action } from '@perses-dev/core';
+import { ReactElement } from 'react';
 
 export interface FormActionsProps extends StackProps {
   action: Action;

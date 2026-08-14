@@ -12,8 +12,9 @@
 // limitations under the License.
 
 import { PanelDefinition } from '@perses-dev/core';
-import { PanelGroupDefinition, PanelGroupItemLayout } from '../context';
+
 import { GRID_LAYOUT_SMALL_BREAKPOINT, GRID_LAYOUT_COLS } from '../constants';
+import { PanelGroupDefinition, PanelGroupItemLayout } from '../context';
 
 // Given a PanelGroup, will find the Y coordinate for adding a new row to the grid, taking into account the items present
 export function getYForNewRow(group: PanelGroupDefinition): number {

@@ -12,12 +12,13 @@
 // limitations under the License.
 
 import { Box } from '@mui/material';
-import { useInView } from 'react-intersection-observer';
 import { DataQueriesProvider, usePlugin, useSuggestedStepMs } from '@perses-dev/plugin-system';
 import React, { ReactElement, useMemo, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+
 import { PanelGroupItemId, useEditMode, usePanel, usePanelActions, useViewPanelGroup } from '../../context';
-import { Panel, PanelProps, PanelOptions } from '../Panel';
 import { isPanelGroupItemIdEqual } from '../../context/DashboardProvider/panel-group-slice';
+import { Panel, PanelProps, PanelOptions } from '../Panel';
 import { QueryViewerDialog } from '../QueryViewerDialog';
 
 export interface GridItemContentProps {

@@ -11,10 +11,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ReactElement, RefObject, useState } from 'react';
 import { Stack, FormLabel, TextField, IconButton, Box } from '@mui/material';
-import DeleteIcon from 'mdi-material-ui/DeleteOutline';
 import { ThresholdOptions } from '@perses-dev/core';
+import DeleteIcon from 'mdi-material-ui/DeleteOutline';
+import { ReactElement, RefObject, useState } from 'react';
+
 import { OptionsColorPicker } from '../ColorPicker/OptionsColorPicker';
 
 export interface ThresholdInputProps {

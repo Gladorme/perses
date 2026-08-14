@@ -11,8 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ExternalVariableDefinition } from '@perses-dev/dashboards';
 import { Variable } from '@perses-dev/core';
+import { ExternalVariableDefinition } from '@perses-dev/dashboards';
+
 import { ExternalVariableSource } from '../model/variables';
 
 export function buildProjectVariableDefinition(projectName: string, variables: Variable[]): ExternalVariableDefinition {

@@ -12,22 +12,23 @@
 // limitations under the License.
 
 import { Box, Grid, MenuItem, Stack } from '@mui/material';
-import { ReactElement, useState } from 'react';
-import HomeIcon from 'mdi-material-ui/Home';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { DashboardSelector, ProjectResource } from '@perses-dev/core';
-import { CreateProjectDialog, CreateDashboardDialog } from '../../components/dialogs';
+import HomeIcon from 'mdi-material-ui/Home';
+import { ReactElement, useState } from 'react';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
+
 import { StackCrumb, TitleCrumb } from '../../components/breadcrumbs/breadcrumbs';
-import { useIsMobileSize } from '../../utils/browser-size';
-import { CRUDButton } from '../../components/CRUDButton/CRUDButton';
 import ButtonMenu from '../../components/ButtonMenu/ButtonMenu';
-import { ImportRoute } from '../../model/route';
+import { CRUDButton } from '../../components/CRUDButton/CRUDButton';
+import { CreateProjectDialog, CreateDashboardDialog } from '../../components/dialogs';
 import { useDashboardCreateAllowedProjects } from '../../context/Authorization';
 import { useIsEphemeralDashboardEnabled } from '../../context/Config';
-import { InformationSection } from './InformationSection';
-import { RecentDashboards } from './RecentDashboards';
-import { ProjectsAndDashboards } from './ProjectsAndDashboards';
+import { ImportRoute } from '../../model/route';
+import { useIsMobileSize } from '../../utils/browser-size';
 import { ImportantDashboards } from './ImportantDashboards';
+import { InformationSection } from './InformationSection';
+import { ProjectsAndDashboards } from './ProjectsAndDashboards';
+import { RecentDashboards } from './RecentDashboards';
 
 function HomeView(): ReactElement {
   // Navigate to the project page if the project has been successfully added

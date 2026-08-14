@@ -15,10 +15,11 @@ import { CircularProgress, Grid, Stack, Typography } from '@mui/material';
 import { DashboardResource } from '@perses-dev/core';
 import StarFourPointsOutline from 'mdi-material-ui/StarFourPointsOutline';
 import { ReactElement } from 'react';
-import { useImportantDashboardList } from '../../model/dashboard-client';
+
 import { DashboardCard } from '../../components/DashboardCard/DashboardCard';
-import { useIsMobileSize } from '../../utils/browser-size';
 import { useConfig } from '../../model/config-client';
+import { useImportantDashboardList } from '../../model/dashboard-client';
+import { useIsMobileSize } from '../../utils/browser-size';
 
 interface DashboardMosaicProps {
   dashboards: DashboardResource[];

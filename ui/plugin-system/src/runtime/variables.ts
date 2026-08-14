@@ -11,9 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { createContext, useContext, useMemo } from 'react';
 import { VariableValue } from '@perses-dev/core';
 import { immerable } from 'immer';
+import { createContext, useContext, useMemo } from 'react';
+
 import { VariableOption } from '../model';
 import { parseVariables, replaceVariables } from '../utils';
 import { useBuiltinVariableValues } from './builtin-variables';

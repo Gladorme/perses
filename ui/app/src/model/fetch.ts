@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { StatusError } from '@perses-dev/core';
+
 import { refreshToken } from './auth-client';
 
 const JWT_COOKIES = ['jwtPayload', 'jwtSignature', 'jwtRefreshToken'];

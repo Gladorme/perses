@@ -11,15 +11,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getUnixTime } from 'date-fns';
 import { QueryDefinition, UnknownSpec, AbsoluteTimeRange, TraceData } from '@perses-dev/core';
 import { QueryKey, useQueries, UseQueryResult } from '@tanstack/react-query';
+import { getUnixTime } from 'date-fns';
+
 import { TraceQueryContext, TraceQueryPlugin } from '../model';
 import { useDatasourceStore } from './datasources';
 import { usePluginRegistry, usePlugins } from './plugin-registry';
 import { useTimeRange } from './TimeRangeProvider';
-import { useAllVariableValues } from './variables';
 import { filterVariableStateMap, getVariableValuesKey } from './utils';
+import { useAllVariableValues } from './variables';
 export type TraceQueryDefinition<PluginSpec = UnknownSpec> = QueryDefinition<'TraceQuery', PluginSpec>;
 export const TRACE_QUERY_KEY = 'TraceQuery';
 

@@ -12,10 +12,11 @@
 // limitations under the License.
 
 import { resolve } from 'node:path';
+
+import { defineConfig } from '@rspack/cli';
 import rspack from '@rspack/core';
 import refreshPlugin from '@rspack/plugin-react-refresh';
 import TerserPlugin from 'terser-webpack-plugin';
-import { defineConfig } from '@rspack/cli';
 
 const isDev = process.env.NODE_ENV === 'development';
 export default defineConfig({

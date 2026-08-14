@@ -20,6 +20,7 @@ import { ReactElement, useLayoutEffect, useState } from 'react';
 import { Router } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+
 import { DatasourceStoreProvider } from '../context';
 import { defaultDatasourceProps } from '../test';
 import { MOCK_PLUGINS } from './plugin-registry';

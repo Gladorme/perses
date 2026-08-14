@@ -11,9 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Box, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import React, { ReactElement } from 'react';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import ShieldAccount from 'mdi-material-ui/ShieldAccount';
+import React, { ReactElement } from 'react';
+
 import { ProfileSections } from './ProfileView';
 
 interface IAccountSettingItem {
@@ -73,30 +74,33 @@ export const ProfileSettings = ({ selectedView, setSelectedView }: IProps): Reac
           </Box>
           <List>
             {s.items.map((i) => (
-              <ListItem
-                role="button"
-                key={i.view}
-                onClick={() => handleViewChange(i.view)}
-                sx={{
-                  color: 'text.primary',
-                  paddingY: 0.5,
-                  cursor: 'pointer',
-                  backgroundColor: selectedView === i.view ? 'action.selected' : 'transparent',
-                  '&:hover': {
-                    backgroundColor: 'action.hover',
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{ minWidth: '36px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+              <ListItem key={i.view} disablePadding>
+                <ListItemButton
+                  onClick={() => handleViewChange(i.view)}
+                  sx={{
+                    color: 'text.primary',
+                    paddingY: 0.5,
+                    cursor: 'pointer',
+                    backgroundColor: selectedView === i.view ? 'action.selected' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: 'action.hover',
+                    },
+                  }}
                 >
-                  {i.icon}
-                </ListItemIcon>
-                <ListItemText>
-                  <Typography variant="h3" sx={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                    {i.title}
-                  </Typography>
-                </ListItemText>
+                  <ListItemIcon
+                    sx={{ minWidth: '36px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                  >
+                    {i.icon}
+                  </ListItemIcon>
+                  <ListItemText>
+                    <Typography
+                      variant="h3"
+                      sx={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
+                    >
+                      {i.title}
+                    </Typography>
+                  </ListItemText>
+                </ListItemButton>
               </ListItem>
             ))}
           </List>

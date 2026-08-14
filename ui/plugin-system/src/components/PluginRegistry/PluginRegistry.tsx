@@ -13,6 +13,7 @@
 
 import { UnknownSpec, useEvent } from '@perses-dev/core';
 import { useRef, useCallback, useMemo, ReactNode, ReactElement } from 'react';
+
 import {
   PluginModuleResource,
   PluginType,

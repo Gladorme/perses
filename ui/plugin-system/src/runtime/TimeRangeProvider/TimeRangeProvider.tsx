@@ -11,7 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { createContext, ReactElement, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   AbsoluteTimeRange,
   DurationString,
@@ -20,6 +19,8 @@ import {
   toAbsoluteTimeRange,
   getSuggestedStepMs,
 } from '@perses-dev/core';
+import React, { createContext, ReactElement, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+
 import { getRefreshIntervalInMs } from './refresh-interval';
 
 export interface TimeRangeProviderProps {

@@ -11,10 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
-import { Action, DEFAULT_DASHBOARD_DURATION, PanelDefinition, PanelEditorValues } from '@perses-dev/core';
 import { DiscardChangesConfirmationDialog, ErrorAlert, ErrorBoundary } from '@perses-dev/components';
+import { Action, DEFAULT_DASHBOARD_DURATION, PanelDefinition, PanelEditorValues } from '@perses-dev/core';
 import {
   PluginKindSelect,
   usePluginEditor,
@@ -27,8 +27,9 @@ import {
   useTimeRangeParams,
   useInitialTimeRange,
 } from '@perses-dev/plugin-system';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, FormProvider, SubmitHandler, useForm, useWatch } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+
 import { useDashboard, useListPanelGroups } from '../../context';
 import { PanelEditorProvider } from '../../context/PanelEditorProvider/PanelEditorProvider';
 import { PanelPreview } from './PanelPreview';

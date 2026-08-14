@@ -11,13 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { PanelDefinition } from '@perses-dev/core';
 import { DataQueriesProvider, TimeRangeProvider, useDataQueriesContext } from '@perses-dev/plugin-system';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { renderWithContext } from '../../test';
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
 import { VariableProvider } from '../../context';
+import { renderWithContext } from '../../test';
 import { Panel, PanelProps } from './Panel';
 
 const testTheme = createTheme({
