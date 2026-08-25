@@ -1,0 +1,111 @@
+# Run with: docker compose --file dev/docker-compose.otel.yaml up --detach
+# Perses provisions the matching datasources from dev/data/4-globaldatasource.json
+# with the OTelDev prefix.
+
+name: 'perses-otel-dev'
+
+x-telemetrygen: &telemetrygen
+  image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.157.0
+  restart: unless-stopped
+  depends_on:
+    - otel-collector
+
+services:
+  prometheus:
+    image: prom/prometheus:v3
+    command:
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+      - --enable-feature=native-histograms
+    volumes:
+      - ./otel/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - '9090:9090'
+
+  tempo:
+    image: grafana/tempo:2.10.3
+    command: ['-config.file=/etc/tempo.yaml']
+    user: '10001:10001'
+    volumes:
+      - ./otel/tempo.yaml:/etc/tempo.yaml:ro
+      - tempo-data:/var/tempo
+    ports:
+      - '3200:3200'
+
+  loki:
+    image: grafana/loki:3.6
+    command: ['-config.file=/etc/loki/local-config.yaml']
+    volumes:
+      - loki-data:/loki
+    ports:
+      - '3100:3100'
+
+  pyroscope:
+    image: grafana/pyroscope:1.14.0
+    ports:
+      - '4040:4040'
+
+  otel-collector:
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.157.0
+    command: ['--config=/etc/otelcol-contrib/config.yaml']
+    volumes:
+      - ./otel/otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - '4317:4317' # OTLP gRPC
+      - '4318:4318' # OTLP HTTP
+      - '13133:13133' # Collector health endpoint
+    depends_on:
+      - loki
+      - prometheus
+      - tempo
+
+  fake-traces:
+    <<: *telemetrygen
+    command:
+      - traces
+      - --otlp-endpoint=otel-collector:4317
+      - --otlp-insecure
+      - --duration=inf
+      - --rate=5
+      - --service=otel-fake-service
+
+  fake-metrics:
+    <<: *telemetrygen
+    command:
+      - metrics
+      - --otlp-endpoint=otel-collector:4317
+      - --otlp-insecure
+      - --duration=inf
+      - --rate=5
+      - --service=otel-fake-service
+
+  fake-logs:
+    <<: *telemetrygen
+    command:
+      - logs
+      - --otlp-endpoint=otel-collector:4317
+      - --otlp-insecure
+      - --duration=inf
+      - --rate=5
+      - --service=otel-fake-service
+
+  fake-profiles:
+    image: grafana/alloy:v1.11.0
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    volumes:
+      - ./extra/alloy-pyroscope.alloy:/etc/alloy/config.alloy:ro
+    restart: unless-stopped
+    depends_on:
+      - pyroscope
+
+volumes:
+  loki-data:
+  prometheus-data:
+  tempo-data:
