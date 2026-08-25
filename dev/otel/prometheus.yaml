@@ -1,6 +1,13 @@
 global:
   evaluation_interval: 15s
 
+otlp:
+  # Preserve OTel metric and attribute names, including dots, instead of
+  # translating them to Prometheus underscore-based names.
+  translation_strategy: NoTranslation
+  promote_all_resource_attributes: true
+  keep_identifying_resource_attributes: true
+
 # Prometheus is storage-only in this environment. The OpenTelemetry Collector
-# sends all metric data through the remote write receiver.
+# sends all metric data through the native OTLP receiver.
 scrape_configs: []

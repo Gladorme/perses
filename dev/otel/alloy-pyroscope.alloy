@@ -1,0 +1,20 @@
+// Generate profiling data for the same logical service used by telemetrygen.
+// Alloy profiles its own active process and publishes the profiles to Pyroscope
+// with a shared service name, making all four signals discoverable together.
+
+pyroscope.write "local" {
+  endpoint {
+    url = "http://pyroscope:4040"
+  }
+}
+
+pyroscope.scrape "otel_fake_service" {
+  targets = [
+    {
+      "__address__" = "localhost:12345",
+      "service_name" = "otel-fake-service",
+    },
+  ]
+
+  forward_to = [pyroscope.write.local.receiver]
+}

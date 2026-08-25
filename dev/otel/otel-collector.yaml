@@ -31,15 +31,10 @@ exporters:
     endpoint: http://loki:3100/otlp
     tls:
       insecure: true
-  prometheus_remote_write:
-    endpoint: http://prometheus:9090/api/v1/write
+  otlphttp/prometheus:
+    endpoint: http://prometheus:9090/api/v1/otlp
     tls:
       insecure: true
-    send_metadata: true
-    resource_to_telemetry_conversion:
-      enabled: true
-    remote_write_queue:
-      num_consumers: 1
 
 service:
   extensions: [health_check]
@@ -51,7 +46,7 @@ service:
     metrics:
       receivers: [otlp, span_metrics]
       processors: [memory_limiter, batch]
-      exporters: [prometheus_remote_write]
+      exporters: [otlphttp/prometheus]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
