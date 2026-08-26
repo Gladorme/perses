@@ -25,6 +25,8 @@ connectors:
 exporters:
   clickhouse/clickhouse:
     endpoint: tcp://clickhouse:9000?dial_timeout=10s
+    username: otel
+    password: otel
     database: otel
     async_insert: true
     create_schema: true

@@ -54,13 +54,15 @@ services:
     profiles: ['clickhouse']
     environment:
       CLICKHOUSE_DB: otel
-      CLICKHOUSE_SKIP_USER_SETUP: 1
+      CLICKHOUSE_USER: otel
+      CLICKHOUSE_PASSWORD: otel
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     volumes:
       - clickhouse-data:/var/lib/clickhouse
     ports:
       - '8123:8123' # HTTP interface used by the Perses datasource
     healthcheck:
-      test: ['CMD', 'wget', '--spider', '--quiet', 'http://localhost:8123/ping']
+      test: ['CMD', 'clickhouse-client', '--user', 'otel', '--password', 'otel', '--query', 'SELECT 1']
       interval: 5s
       timeout: 5s
       retries: 10

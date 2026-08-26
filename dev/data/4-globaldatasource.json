@@ -310,6 +310,7 @@
                   "method": "GET"
                 }
               ],
+              "secret": "OTelDevClickHouseAuth",
               "url": "http://localhost:8123"
             }
           }
