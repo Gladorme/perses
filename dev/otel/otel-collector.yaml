@@ -23,6 +23,15 @@ connectors:
     metrics_flush_interval: 5s
 
 exporters:
+  clickhouse/clickhouse:
+    endpoint: tcp://clickhouse:9000?dial_timeout=10s
+    database: otel
+    async_insert: true
+    create_schema: true
+    ttl: 72h
+    compress: lz4
+    timeout: 10s
+  nop/clickhouse:
   otlp/tempo:
     endpoint: tempo:4317
     tls:
@@ -42,12 +51,12 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [otlp/tempo, span_metrics]
+      exporters: ['${env:CLICKHOUSE_EXPORTER_TYPE}/clickhouse', otlp/tempo, span_metrics]
     metrics:
       receivers: [otlp, span_metrics]
       processors: [memory_limiter, batch]
-      exporters: [otlphttp/prometheus]
+      exporters: ['${env:CLICKHOUSE_EXPORTER_TYPE}/clickhouse', otlphttp/prometheus]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [otlphttp/loki]
+      exporters: ['${env:CLICKHOUSE_EXPORTER_TYPE}/clickhouse', otlphttp/loki]

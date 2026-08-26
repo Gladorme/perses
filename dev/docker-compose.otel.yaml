@@ -1,4 +1,5 @@
 # Run with: docker compose --file dev/docker-compose.otel.yaml up --detach
+# Add ClickHouse with: COMPOSE_PROFILES=clickhouse docker compose --file dev/docker-compose.otel.yaml up --detach
 # Perses provisions the matching datasources from dev/data/4-globaldatasource.json
 # with the OTelDev prefix.
 
@@ -48,9 +49,27 @@ services:
     ports:
       - '4040:4040'
 
+  clickhouse:
+    image: clickhouse/clickhouse-server:26.3
+    profiles: ['clickhouse']
+    environment:
+      CLICKHOUSE_DB: otel
+      CLICKHOUSE_SKIP_USER_SETUP: 1
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    ports:
+      - '8123:8123' # HTTP interface used by the Perses datasource
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '--quiet', 'http://localhost:8123/ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   otel-collector:
     image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.157.0
     command: ['--config=/etc/otelcol-contrib/config.yaml']
+    environment:
+      CLICKHOUSE_EXPORTER_TYPE: ${COMPOSE_PROFILES:-nop}
     volumes:
       - ./otel/otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
     ports:
@@ -58,9 +77,15 @@ services:
       - '4318:4318' # OTLP HTTP
       - '13133:13133' # Collector health endpoint
     depends_on:
-      - loki
-      - prometheus
-      - tempo
+      clickhouse:
+        condition: service_healthy
+        required: false
+      loki:
+        condition: service_started
+      prometheus:
+        condition: service_started
+      tempo:
+        condition: service_started
 
   fake-traces:
     <<: *telemetrygen
@@ -106,6 +131,7 @@ services:
       - pyroscope
 
 volumes:
+  clickhouse-data:
   loki-data:
   prometheus-data:
   tempo-data:

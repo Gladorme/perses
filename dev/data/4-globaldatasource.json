@@ -290,5 +290,31 @@
         }
       }
     }
+  },
+  {
+    "kind": "GlobalDatasource",
+    "metadata": {
+      "name": "OTelDevClickHouse"
+    },
+    "spec": {
+      "default": false,
+      "plugin": {
+        "kind": "ClickHouseDatasource",
+        "spec": {
+          "proxy": {
+            "kind": "HTTPProxy",
+            "spec": {
+              "allowedEndpoints": [
+                {
+                  "endpointPattern": "/",
+                  "method": "GET"
+                }
+              ],
+              "url": "http://localhost:8123"
+            }
+          }
+        }
+      }
+    }
   }
 ]
