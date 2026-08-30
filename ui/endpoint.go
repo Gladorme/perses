@@ -40,7 +40,7 @@ import (
 
 var pluginPathRegex = regexp.MustCompile(`^/plugins/[^/]+`)
 
-const prefixPathPlaceholder = "PREFIX_PATH_PLACEHOLDER"
+const prefixPathPlaceholder = "/PREFIX_PATH_PLACEHOLDER"
 
 var (
 	asts        = http.FS(assets.New(embedFS))
@@ -175,9 +175,9 @@ func proxyPrepareRequest(c echo.Context, devEnvironment *v1.PluginInDevelopment)
 }
 
 // assetHandler is here to serve the static files of the React app.
-// With Webpack, we have injected the placeholder in the index.html and in every JS file that contains a route.
+// With Vite, we inject the placeholder in index.html and every JS or CSS file that contains an asset path.
 // This is the only way to ensure that every asset is served with the proper prefix path.
-// So, at runtime, we need to open the JS files and then replace the placeholder with the actual API prefix.
+// So, at runtime, we need to open the JS and CSS files and replace the placeholder with the actual API prefix.
 func (f *frontend) assetHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		fileName := c.Request().URL.Path

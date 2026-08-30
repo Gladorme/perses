@@ -16,7 +16,7 @@ Below is a list of notable tooling that is used throughout the Perses UI.
 
 - Development utilities
   - Monorepo management: [turborepo](https://turbo.build/)
-  - Code compiling: [swc](https://swc.rs/) (used for libraries), [webpack](https://webpack.js.org/) (used for applications)
+  - Code compiling: [swc](https://swc.rs/) (used for libraries), [Vite](https://vite.dev/) (used for applications)
   - Code linting/formatting: [Oxlint](https://oxc.rs/docs/guide/usage/linter) with the
     [React Doctor plugin](https://www.react.doctor/docs/configuration/eslint-and-oxlint-plugins), and
     [Oxfmt](https://oxc.rs/docs/guide/usage/formatter)
@@ -121,9 +121,7 @@ are reflected in how the packages are organized. There is some variability from 
 
 ### Application
 
-- We use webpack to bundle our application, our config is heavily inspired by Create
-  React App, but ejected because we had the need to configure it to support specific
-  requirements for our project
+- We use Vite to build and serve our application.
 
 ### Libraries
 

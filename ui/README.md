@@ -74,8 +74,8 @@ The following packages are internal tooling that assists with development of the
 First, check out the [UI Guidelines](./ui-guidelines.md) for some information on how the codebase is organized and our
 approach to development in the UI. You'll need to have the following installed locally before you can start developing:
 
-- [Node.js](https://nodejs.org/) v18 or higher: we suggest using [NVM](https://github.com/nvm-sh/nvm) for installing
-  and managing versions.
+- [Node.js](https://nodejs.org/) at the version specified in [`.nvmrc`](./.nvmrc): we suggest using
+  [NVM](https://github.com/nvm-sh/nvm) for installing and managing versions.
 - [NPM](https://npmjs.com/) v7 or higher: a version of `npm` that supports workspaces (use
   `npm --version` to check your version locally)
 

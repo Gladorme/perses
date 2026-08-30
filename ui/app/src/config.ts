@@ -11,9 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Variables here are injected at build time by rspack, see `rspack.config.ts`
+// Vite exposes the configured base path through import.meta.env.BASE_URL.
 export const PERSES_APP_CONFIG = {
-  api_prefix: process.env.API_PREFIX ? process.env.API_PREFIX : '',
+  api_prefix: import.meta.env.BASE_URL.replace(/\/$/, ''),
 };
 
 // Make it available in the global window for non-module code
@@ -23,7 +23,7 @@ window.PERSES_APP_CONFIG ??= PERSES_APP_CONFIG;
 declare global {
   interface Window {
     /**
-     * Injected at build time by rspack, see `rspack.config.ts`
+     * Injected at build time by Vite, see `vite.config.mts`.
      * If you are using this in a module, prefer to import the variable from
      * `<root>/config.ts` instead.
      *

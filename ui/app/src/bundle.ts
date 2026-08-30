@@ -13,5 +13,5 @@
 
 import { renderApp } from './render-app';
 
-// Main entrypoint for the webpack bundle, just renders the app into the #root element in the index.html
+// Main entrypoint for the Vite bundle, just renders the app into the #root element in the index.html
 renderApp(document.getElementById('root'));

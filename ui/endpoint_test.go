@@ -37,8 +37,8 @@ func TestAssetHandlerContentType(t *testing.T) {
 	t.Cleanup(func() { asts = originalAsts })
 
 	testFS := fstest.MapFS{
-		"app/dist/main.abc123.css": &fstest.MapFile{Data: []byte("body { background: url(PREFIX_PATH_PLACEHOLDER/font.woff2); }")},
-		"app/dist/main.abc123.js":  &fstest.MapFile{Data: []byte("console.log('PREFIX_PATH_PLACEHOLDER')")},
+		"app/dist/main.abc123.css": &fstest.MapFile{Data: []byte("body { background: url(/PREFIX_PATH_PLACEHOLDER/font.woff2); }")},
+		"app/dist/main.abc123.js":  &fstest.MapFile{Data: []byte("console.log('/PREFIX_PATH_PLACEHOLDER')")},
 		"app/dist/image.png":       &fstest.MapFile{Data: []byte("fake-png-data")},
 		"app/dist/index.html":      &fstest.MapFile{Data: []byte("<html></html>")},
 	}
@@ -97,11 +97,11 @@ func TestServeASTFilesContentType(t *testing.T) {
 	t.Cleanup(func() { asts = originalAsts })
 
 	testFS := fstest.MapFS{
-		"app/dist/index.html": &fstest.MapFile{Data: []byte("<html><head></head><body></body></html>")},
+		"app/dist/index.html": &fstest.MapFile{Data: []byte(`<html><head><link href="/PREFIX_PATH_PLACEHOLDER/favicon.ico"></head><body></body></html>`)},
 	}
 	asts = http.FS(testFS)
 
-	f := &frontend{apiPrefix: ""}
+	f := &frontend{apiPrefix: "/custom"}
 
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -112,6 +112,7 @@ func TestServeASTFilesContentType(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "text/html; charset=utf-8", rec.Header().Get("Content-Type"))
 	assert.Equal(t, "nosniff", rec.Header().Get("X-Content-Type-Options"))
+	assert.Equal(t, `<html><head><link href="/custom/favicon.ico"></head><body></body></html>`, rec.Body.String())
 }
 
 func TestParsePluginPath(t *testing.T) {
