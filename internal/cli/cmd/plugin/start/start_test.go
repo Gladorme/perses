@@ -15,6 +15,7 @@ package start
 
 import (
 	"bytes"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -52,6 +53,67 @@ func TestGetServerPortAndExactPluginName(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, tt.expectedPort, port)
 			assert.Equal(t, tt.expectedName, name)
+		})
+	}
+}
+
+func TestGetServerPortAndExactPluginNameVite(t *testing.T) {
+	pluginPath := t.TempDir()
+	config := []byte(`export default createConfigForPlugin({
+  name: 'BarChart',
+  viteConfig: {
+    server: { port: 3005 },
+  },
+});`)
+	require.NoError(t, os.WriteFile(filepath.Join(pluginPath, "vite.config.ts"), config, 0o600))
+
+	port, name, err := getServerPortAndExactPluginName(pluginPath)
+	require.NoError(t, err)
+	assert.Equal(t, 3005, port)
+	assert.Equal(t, "BarChart", name)
+}
+
+func TestFindDevServerScript(t *testing.T) {
+	tests := []struct {
+		name     string
+		scripts  map[string]string
+		expected string
+	}{
+		{
+			name:     "conventional Vite script",
+			scripts:  map[string]string{"dev": "vite", "build": "vite build"},
+			expected: "dev",
+		},
+		{
+			name:     "generic dev script may wrap the server",
+			scripts:  map[string]string{"dev": "npm run prepare && node scripts/start-server.mjs"},
+			expected: "dev",
+		},
+		{
+			name:     "legacy Rsbuild script with custom name",
+			scripts:  map[string]string{"start:plugin": "rsbuild dev"},
+			expected: "start:plugin",
+		},
+		{
+			name:     "Vite script with custom name",
+			scripts:  map[string]string{"start:plugin": "cross-env MODE=dev vite --host localhost"},
+			expected: "start:plugin",
+		},
+		{
+			name:     "Vite build is not a development server",
+			scripts:  map[string]string{"build": "vite build"},
+			expected: "",
+		},
+		{
+			name:     "missing development script",
+			scripts:  map[string]string{"test": "vitest run"},
+			expected: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, findDevServerScript(tt.scripts))
 		})
 	}
 }

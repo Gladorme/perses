@@ -21,6 +21,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -42,7 +43,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const defaultRSBuildPort = 3000
+const defaultDevServerPort = 3000
+
+var devServerConfigFileNames = []string{
+	"vite.config.ts",
+	"vite.config.mts",
+	"vite.config.js",
+	"vite.config.mjs",
+	"vite.config.cts",
+	"vite.config.cjs",
+	"rsbuild.config.ts",
+	"rsbuild.config.mts",
+	"rsbuild.config.js",
+	"rsbuild.config.mjs",
+	"rsbuild.config.cts",
+	"rsbuild.config.cjs",
+}
 
 var (
 	portRegexp = regexp.MustCompile(`(?m)port\s*:\s*(\d+)`)
@@ -54,10 +70,11 @@ func extractServerPort(data []byte) (int, error) {
 	//  server: {
 	//    port: 8080,
 	//  }
-	// If not find, the default port will be 3000 as defined in the rsbuild documentation.
+	// If not found, use the historical default. The port reported by the running dev server
+	// will replace this value when available.
 	matches := portRegexp.FindSubmatch(data)
 	if len(matches) != 2 {
-		return defaultRSBuildPort, nil
+		return defaultDevServerPort, nil
 	}
 	return strconv.Atoi(string(matches[1]))
 }
@@ -71,11 +88,22 @@ func extractPluginName(data []byte) (string, error) {
 }
 
 func getServerPortAndExactPluginName(pluginPath string) (int, string, error) {
-	// todo we should support all format supported by rsbuild: https://rsbuild.dev/guide/basic/configure-rsbuild#configuration-file
-	configPath := filepath.Join(pluginPath, "rsbuild.config.ts")
-	data, err := os.ReadFile(configPath) //nolint: gosec
-	if err != nil {
-		return 0, "", err
+	var data []byte
+	var configPath string
+	for _, configFileName := range devServerConfigFileNames {
+		configPath = filepath.Join(pluginPath, configFileName)
+		var err error
+		data, err = os.ReadFile(configPath) //nolint: gosec
+		if err == nil {
+			break
+		}
+		if !errors.Is(err, os.ErrNotExist) {
+			return 0, "", err
+		}
+		data = nil
+	}
+	if data == nil {
+		return 0, "", fmt.Errorf("unable to find a Vite or Rsbuild configuration in %q", pluginPath)
 	}
 	port, err := extractServerPort(data)
 	if err != nil {
@@ -86,6 +114,40 @@ func getServerPortAndExactPluginName(pluginPath string) (int, string, error) {
 		return 0, "", err
 	}
 	return port, name, nil
+}
+
+func findDevServerScript(scripts map[string]string) string {
+	if strings.TrimSpace(scripts["dev"]) != "" {
+		return "dev"
+	}
+
+	// Keep supporting packages whose development script has a non-standard name.
+	// Sort the names so discovery remains deterministic when more than one script matches.
+	scriptNames := make([]string, 0, len(scripts))
+	for scriptName := range scripts {
+		scriptNames = append(scriptNames, scriptName)
+	}
+	sort.Strings(scriptNames)
+	for _, scriptName := range scriptNames {
+		script := scripts[scriptName]
+		if strings.Contains(script, "rsbuild dev") || isViteDevCommand(script) {
+			return scriptName
+		}
+	}
+	return ""
+}
+
+func isViteDevCommand(script string) bool {
+	fields := strings.Fields(script)
+	for i, field := range fields {
+		if field != "vite" && field != "vite.cmd" {
+			continue
+		}
+		if i+1 == len(fields) || strings.HasPrefix(fields[i+1], "-") || fields[i+1] == "dev" || fields[i+1] == "serve" {
+			return true
+		}
+	}
+	return false
 }
 
 // buildTasks is responsible to create the list of tasks that will be executed.
@@ -321,25 +383,20 @@ func (o *option) preparePlugin(pluginPath string, c *color.Color) (*devserver, *
 	if readErr != nil {
 		return nil, nil, fmt.Errorf("failed to read package for the plugin %q: %w", pluginPath, readErr)
 	}
-	var rsbuildCMD string
-	for scriptName, script := range npmPackageData.Scripts {
-		if strings.Contains(script, "rsbuild dev") {
-			rsbuildCMD = scriptName
-		}
-	}
-	if rsbuildCMD == "" {
-		return nil, nil, fmt.Errorf("unable to find how to run the rsbuild dev server in the file package.json for the plugin %q", pluginPath)
+	devServerScript := findDevServerScript(npmPackageData.Scripts)
+	if devServerScript == "" {
+		return nil, nil, fmt.Errorf("unable to find a development server script in package.json for the plugin %q", pluginPath)
 	}
 	// Then, we need to find which port is used by the dev server.
 	port, pluginName, err := getServerPortAndExactPluginName(pluginPath)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to get the dev server port for the plugin %q", pluginPath)
+		return nil, nil, fmt.Errorf("failed to get the dev server configuration for the plugin %q: %w", pluginPath, err)
 	}
 	abs, err := filepath.Abs(pluginPath)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get the absolute path for the plugin %q", pluginPath)
 	}
-	server := newDevServer(pluginName, pluginPath, rsbuildCMD, o.writer, o.errWriter, c)
+	server := newDevServer(pluginName, pluginPath, devServerScript, o.writer, o.errWriter, c)
 	pluginInDevelopment := &v1.PluginInDevelopment{
 		Name:         pluginName,
 		Version:      npmPackageData.Version,
@@ -443,7 +500,7 @@ The command is used to start a plugin in development mode.
 That means you can run the plugin in your local environment and see the effect of your changes in real time directly in the Perses UI.
 The command will discover which port is exposed, the exact name of the plugin and the absolute path required for the schemas.
 
-Once these information are collected, the command will execute the npm script defined in "package.json" that contains the command "rsbuild dev" to start any plugin dev server.
+Once this information is collected, the command will execute the "dev" npm script defined in "package.json" to start each plugin development server. Vite and Rsbuild scripts with non-standard names are also supported.
 When they are all ready, it will send the config to the Perses remote server.
 
 When Perses is receiving the dev config, it will contact every dev server listed to load the plugin and ensure the plugin is available in the UI.`,

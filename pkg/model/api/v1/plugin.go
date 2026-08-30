@@ -53,7 +53,7 @@ type PluginInDevelopment struct {
 	// It is useful when the plugin is in development and the schema is not yet defined.
 	DisableSchema bool `json:"disable_schema,omitempty" yaml:"disable_schema,omitempty"`
 	// The URL of the development server hosting the plugin.
-	// It is usually created by the command `rsbuild dev`.
+	// It is usually created by the plugin package's development script.
 	// If defined, it will override the URL defined in the `PluginDevEnvironment`.
 	URL *common.URL `json:"url,omitempty" yaml:"url,omitempty"`
 	// The absolute path to the plugin repository

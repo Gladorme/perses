@@ -26,6 +26,7 @@ import (
 	"github.com/perses/perses/internal/api/plugin/migrate"
 	"github.com/perses/perses/internal/api/plugin/schema"
 	v1 "github.com/perses/perses/pkg/model/api/v1"
+	"github.com/perses/spec/go/common"
 	"github.com/perses/spec/go/module"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -394,6 +395,69 @@ func TestServePluginFilesPathTraversal(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
+		})
+	}
+}
+
+func TestServePluginFilesDevProxyPath(t *testing.T) {
+	tests := []struct {
+		name         string
+		apiPrefix    string
+		requestPath  string
+		expectedPath string
+	}{
+		{
+			name:         "manifest keeps Vite plugin base",
+			requestPath:  "/plugins/BarChart/mf-manifest.json",
+			expectedPath: "/plugins/BarChart/mf-manifest.json",
+		},
+		{
+			name:         "Vite client keeps plugin base",
+			requestPath:  "/plugins/BarChart/@vite/client",
+			expectedPath: "/plugins/BarChart/@vite/client",
+		},
+		{
+			name:         "versioned identity is normalized to development base",
+			requestPath:  "/plugins/BarChart~1.2.3~example.com/__mf/remoteEntry.js",
+			expectedPath: "/plugins/BarChart/__mf/remoteEntry.js",
+		},
+		{
+			name:         "API prefix is removed from upstream path",
+			apiPrefix:    "/perses",
+			requestPath:  "/perses/plugins/BarChart/@vite/client",
+			expectedPath: "/plugins/BarChart/@vite/client",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			upstreamPath := make(chan string, 1)
+			upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				upstreamPath <- r.URL.Path
+				w.WriteHeader(http.StatusOK)
+			}))
+			defer upstream.Close()
+
+			mockSvc := &mockPluginService{
+				loaded: map[string]*plugin.Loaded{
+					"BarChart": {
+						Module: v1.PluginModule{Status: &module.Status{IsLoaded: true}},
+						DevEnvironment: &v1.PluginInDevelopment{
+							Name: "BarChart",
+							URL:  common.MustParseURL(upstream.URL),
+						},
+					},
+				},
+			}
+			f := &frontend{apiPrefix: tt.apiPrefix, pluginService: mockSvc}
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, tt.requestPath, nil)
+			rec := httptest.NewRecorder()
+
+			err := f.servePluginFiles(e.NewContext(req, rec))
+			require.NoError(t, err)
+			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Equal(t, tt.expectedPath, <-upstreamPath)
 		})
 	}
 }

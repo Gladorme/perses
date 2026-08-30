@@ -23,7 +23,6 @@ import (
 	"net/http/httputil"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -37,8 +36,6 @@ import (
 	"github.com/prometheus/common/assets"
 	"github.com/sirupsen/logrus"
 )
-
-var pluginPathRegex = regexp.MustCompile(`^/plugins/[^/]+`)
 
 const prefixPathPlaceholder = "/PREFIX_PATH_PLACEHOLDER"
 
@@ -126,10 +123,15 @@ func (f *frontend) servePluginFiles(c echo.Context) error {
 		return c.File(localPath)
 	}
 	// Otherwise, it means we are in a dev environment, and we need to proxy the request to the dev server.
-	// When developing a plugin, you will be able to serve the files of the plugin using a dev server (with rsbuild).
+	// Vite serves development assets below /plugins/<name>/, so normalize the requested
+	// identity (which may include a version and registry) to that upstream base path.
 	res := c.Response()
 	var proxyErr error
-	req.URL.Path = pluginPathRegex.ReplaceAllString(req.URL.Path, "")
+	req.URL.Path = path.Join("/plugins", pluginName, relPath)
+	if relPath == "" && strings.HasSuffix(urlPath, "/") {
+		req.URL.Path += "/"
+	}
+	req.URL.RawPath = ""
 
 	reverseProxy := httputil.NewSingleHostReverseProxy(devEnvironment.URL.URL)
 

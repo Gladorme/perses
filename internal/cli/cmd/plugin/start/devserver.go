@@ -75,14 +75,14 @@ func (d *devserver) GetPort() <-chan int {
 	return d.portChan
 }
 
-func newDevServer(pluginName, pluginPath, rsbuildScriptName string, writer, errWriter io.Writer, c *color.Color) *devserver {
+func newDevServer(pluginName, pluginPath, devServerScriptName string, writer, errWriter io.Writer, c *color.Color) *devserver {
 	portChan := make(chan int)
 
 	streamWriter := newPrefixedStream(pluginName, writer, c)
 	streamErrWriter := newPrefixedStream(pluginName, errWriter, c)
 	portCapturingWriter := newPortCapturingWriter(streamWriter, portChan)
 
-	cmd := exec.Command("npm", "run", rsbuildScriptName) //nolint:gosec
+	cmd := exec.Command("npm", "run", devServerScriptName) //nolint:gosec
 	cmd.Stdout = portCapturingWriter
 	cmd.Stderr = streamErrWriter
 	cmd.Dir = pluginPath

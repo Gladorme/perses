@@ -35,12 +35,12 @@ import (
 
 type devserver struct {
 	async.SimpleTask
-	pluginName        string
-	pluginPath        string
-	rsbuildScriptName string
-	writer            io.Writer
-	errWriter         io.Writer
-	portChan          chan int
+	pluginName          string
+	pluginPath          string
+	devServerScriptName string
+	writer              io.Writer
+	errWriter           io.Writer
+	portChan            chan int
 }
 
 type portCapturingWriter struct {
@@ -81,7 +81,7 @@ func (d *devserver) GetPort() <-chan int {
 	return d.portChan
 }
 
-func newDevServer(pluginName, pluginPath, rsbuildScriptName string, writer, errWriter io.Writer, c *color.Color) *devserver {
+func newDevServer(pluginName, pluginPath, devServerScriptName string, writer, errWriter io.Writer, c *color.Color) *devserver {
 	portChan := make(chan int)
 
 	streamWriter := newPrefixedStream(pluginName, writer, c)
@@ -89,17 +89,17 @@ func newDevServer(pluginName, pluginPath, rsbuildScriptName string, writer, errW
 	portCapturingWriter := newPortCapturingWriter(streamWriter, portChan)
 
 	return &devserver{
-		pluginName:        pluginName,
-		pluginPath:        pluginPath,
-		rsbuildScriptName: rsbuildScriptName,
-		writer:            portCapturingWriter,
-		errWriter:         streamErrWriter,
-		portChan:          portChan,
+		pluginName:          pluginName,
+		pluginPath:          pluginPath,
+		devServerScriptName: devServerScriptName,
+		writer:              portCapturingWriter,
+		errWriter:           streamErrWriter,
+		portChan:            portChan,
 	}
 }
 
 func (d *devserver) Execute(ctx context.Context, _ context.CancelFunc) error {
-	cmd := exec.CommandContext(ctx, "npm", "run", d.rsbuildScriptName)
+	cmd := exec.CommandContext(ctx, "npm", "run", d.devServerScriptName)
 	cmd.Stdout = d.writer
 	cmd.Stderr = d.errWriter
 	cmd.Dir = d.pluginPath
