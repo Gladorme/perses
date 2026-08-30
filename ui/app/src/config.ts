@@ -23,7 +23,7 @@ window.PERSES_APP_CONFIG ??= PERSES_APP_CONFIG;
 declare global {
   interface Window {
     /**
-     * Injected at build time by Vite, see `vite.config.mts`.
+     * Injected at build time by Vite, see `vite.config.ts`.
      * If you are using this in a module, prefer to import the variable from
      * `<root>/config.ts` instead.
      *

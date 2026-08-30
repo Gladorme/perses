@@ -16,7 +16,7 @@ Below is a list of notable tooling that is used throughout the Perses UI.
 
 - Development utilities
   - Monorepo management: [turborepo](https://turbo.build/)
-  - Code compiling: [swc](https://swc.rs/) (used for libraries), [Vite](https://vite.dev/) (used for applications)
+  - Code compiling and bundling: [Vite](https://vite.dev/) (used for the application)
   - Code linting/formatting: [Oxlint](https://oxc.rs/docs/guide/usage/linter) with the
     [React Doctor plugin](https://www.react.doctor/docs/configuration/eslint-and-oxlint-plugins), and
     [Oxfmt](https://oxc.rs/docs/guide/usage/formatter)
@@ -125,7 +125,8 @@ are reflected in how the packages are organized. There is some variability from 
 
 ### Libraries
 
-- We use swc and tsc to build libraries.
+- Reusable UI libraries live in `perses/shared` and own their build configuration. TypeScript type-checks the internal
+  tooling packages that remain in this repository.
 
 ## Naming conventions
 
