@@ -27,6 +27,8 @@ typedoc
 
 # Ignore turborepo cache
 .turbo
+# Ignore Rsdoctor bundle analysis reports
+.rsdoctor
 
 # Ignore test coverage output
 coverage

@@ -12,7 +12,9 @@
     "test": "cross-env TZ=UTC vitest run",
     "lint": "oxlint src",
     "lint:fix": "oxlint --fix src",
-    "analyze": "rspack build --analyze"
+    "analyze": "rspack build --analyze",
+    "analyze:rsdoctor": "cross-env RSDOCTOR=true rspack build",
+    "analyze:rsdoctor:brief": "cross-env RSDOCTOR=true RSDOCTOR_MODE=brief rspack build"
   },
   "dependencies": {
     "@emotion/react": "^11.9.3",
@@ -50,6 +52,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@rsdoctor/rspack-plugin": "^1.6.3",
     "@rspack/cli": "^2.0.1",
     "@rspack/core": "^2.0.1",
     "@rspack/dev-server": "^2.1.0",

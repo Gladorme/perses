@@ -14,6 +14,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
+import { initI18n } from './i18n/i18n';
 import Router from './Router';
 /**
  * Renders the Perses application in the target container.
@@ -22,6 +23,8 @@ export function renderApp(container: Element | null): void {
   if (container === null) {
     return;
   }
+
+  initI18n();
 
   const root = ReactDOM.createRoot(container);
 

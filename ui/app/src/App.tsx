@@ -24,7 +24,6 @@ import { PersesLoader } from './components/PersesLoader';
 import { ShortcutHelpModal } from './components/ShortcutHelpModal';
 import { useIsKeyboardShortcutsEnabled } from './context/Config';
 import { DelegatedAuthnErrorRoute, SignInRoute, SignUpRoute } from './model/route';
-import './i18n/i18n';
 
 function isDashboardViewRoute(pathname: string): boolean {
   return /\/projects\/[a-zA-Z0-9_]+\/dashboards\/[a-zA-Z0-9_]+/.test(pathname);

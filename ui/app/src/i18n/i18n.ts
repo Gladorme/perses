@@ -18,26 +18,39 @@ import { initReactI18next } from 'react-i18next';
 
 import { PERSES_APP_CONFIG } from '../config';
 
-i18n
-  .use(HttpBackend)
-  .use(initReactI18next)
-  .init<HttpBackendOptions>({
-    lng: 'en',
-    fallbackLng: 'en',
-    supportedLngs: ['en', 'fr', 'am'],
-    ns: ['dashboard'],
-    defaultNS: 'dashboard',
-    backend: {
-      loadPath: `${PERSES_APP_CONFIG.api_prefix}/locales/{{lng}}.{{ns}}.json`,
-    },
+/**
+ * Configures the shared i18next instance used through `react-i18next`.
+ *
+ * This is called explicitly from the application bootstrap rather than run as an import side
+ * effect, so that importers depend on a value instead of on module evaluation order. Repeated calls
+ * are ignored, which keeps development hot reloads from re-initializing the instance.
+ */
+export function initI18n(): void {
+  if (i18n.isInitialized) {
+    return;
+  }
 
-    interpolation: {
-      escapeValue: false,
-    },
+  i18n
+    .use(HttpBackend)
+    .use(initReactI18next)
+    .init<HttpBackendOptions>({
+      lng: 'en',
+      fallbackLng: 'en',
+      supportedLngs: ['en', 'fr', 'am'],
+      ns: ['dashboard'],
+      defaultNS: 'dashboard',
+      backend: {
+        loadPath: `${PERSES_APP_CONFIG.api_prefix}/locales/{{lng}}.{{ns}}.json`,
+      },
 
-    react: {
-      useSuspense: true,
-    },
-  });
+      interpolation: {
+        escapeValue: false,
+      },
+
+      react: {
+        useSuspense: true,
+      },
+    });
+}
 
 export default i18n;

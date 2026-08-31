@@ -13,6 +13,7 @@
 
 import { resolve } from 'node:path';
 
+import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import { defineConfig } from '@rspack/cli';
 import rspack from '@rspack/core';
 import { ReactRefreshRspackPlugin } from '@rspack/plugin-react-refresh';
@@ -20,6 +21,12 @@ import TerserPlugin from 'terser-webpack-plugin';
 
 const isDev = process.env.NODE_ENV === 'development';
 const isSharedDev = isDev && process.env.SHARED_DEV === 'true';
+
+// Rsdoctor measurably slows the build down, so it is opt-in via `npm run analyze:rsdoctor`.
+const isRsdoctor = process.env.RSDOCTOR === 'true';
+// `brief` emits a single self-contained HTML file instead of a served report, which is what you
+// want for CI artifacts or for sharing a report with someone else.
+const rsdoctorBrief = process.env.RSDOCTOR_MODE === 'brief';
 
 // When SHARED_DEV=true, resolve shared packages from an adjacent perses/shared checkout (see that repo for linking instructions).
 const sharedPackagesPath = process.env.SHARED_PACKAGES_PATH ?? resolve(import.meta.dirname, '../../../shared');
@@ -177,5 +184,18 @@ export default defineConfig({
       ],
     }),
     isDev ? new ReactRefreshRspackPlugin() : null,
+    isRsdoctor
+      ? new RsdoctorRspackPlugin({
+          output: {
+            // Keep reports out of `dist` so `npm run clean` and `output.clean` do not wipe them,
+            // which lets you keep a baseline report around to compare against.
+            reportDir: resolve(import.meta.dirname, './.rsdoctor'),
+            mode: rsdoctorBrief ? 'brief' : 'normal',
+            ...(rsdoctorBrief ? { options: { type: ['html', 'json'] } } : {}),
+          },
+          // CI has no browser to open and the report server would keep the job hanging.
+          disableClientServer: process.env.CI === 'true' || rsdoctorBrief,
+        })
+      : null,
   ].filter(Boolean),
 });
