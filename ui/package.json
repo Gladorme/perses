@@ -34,6 +34,13 @@
     "e2e",
     "internal-utils"
   ],
+  "reactDoctor": {
+    "ignore": {
+      "rules": [
+        "react-doctor/no-barrel-import"
+      ]
+    }
+  },
   "devDependencies": {
     "@testing-library/dom": "^10.1.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -47,8 +54,8 @@
     "cross-env": "^7.0.3",
     "esbuild-loader": "^4.0.3",
     "jsdom": "^27.0.0",
-    "oxfmt": "0.55.0",
-    "oxlint": "1.70.0",
+    "oxfmt": "0.66.0",
+    "oxlint": "1.81.0",
     "oxlint-plugin-react-doctor": "0.9.12",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",

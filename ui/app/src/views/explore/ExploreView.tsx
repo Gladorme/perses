@@ -134,7 +134,10 @@ function HelperExploreView(): ReactElement {
   // Invalidate datasource select item cache when project changes so
   // DatasourceStoreProvider re-fetches with the new project scope
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['listDatasourceSelectItems'] });
+    queryClient.invalidateQueries({
+      predicate: ({ queryKey }) =>
+        queryKey[0] === 'listDatasourceSelectItems' && (queryKey[2] === undefined || queryKey[2] !== projectName),
+    });
   }, [projectName, queryClient]);
 
   // Fetch the list of projects the user has access to
