@@ -1,0 +1,92 @@
+# Compares the size of the UI bundle built from the base branch (e.g. main) with the one built from the PR.
+# The report is displayed in the workflow summary and posted on the PR by the bundle-size-comment workflow.
+name: bundle-size
+on:
+  pull_request:
+    paths:
+      - "ui/**"
+      - "scripts/bundle-size/**"
+      - ".github/workflows/bundle-size.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "build (${{ matrix.target }})"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [base, pr]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # The PR merge commit is checked out. Its first parent is the tip of the base branch.
+          fetch-depth: 2
+      - name: Keep the bundle-size script from the PR
+        run: cp scripts/bundle-size/bundle-size.mjs "$RUNNER_TEMP/bundle-size.mjs"
+      - name: Checkout base branch
+        if: ${{ matrix.target == 'base' }}
+        run: git checkout --quiet --detach HEAD^1
+      - uses: perses/github-actions@v0.13.0
+      - uses: ./.github/perses-ci/actions/setup_environment
+        with:
+          enable_npm: true
+          nvmrc_path: "./ui/.nvmrc"
+      - name: Install UI deps
+        working-directory: ./ui
+        run: npm ci
+      - name: Build the app
+        working-directory: ./ui
+        run: npm run build
+      - name: Measure bundle size
+        run: node "$RUNNER_TEMP/bundle-size.mjs" measure --output "$RUNNER_TEMP/${{ matrix.target }}.json" app=ui/app/dist
+      - name: Store measure
+        uses: actions/upload-artifact@v7
+        with:
+          name: bundle-size-${{ matrix.target }}
+          path: ${{ runner.temp }}/${{ matrix.target }}.json
+          retention-days: 7
+
+  report:
+    name: "report"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+          sparse-checkout: scripts/bundle-size
+      - name: Download measures
+        uses: actions/download-artifact@v8
+        with:
+          pattern: bundle-size-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/measures
+      - name: Compare bundle sizes
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/report"
+          node scripts/bundle-size/bundle-size.mjs compare \
+            --base "$RUNNER_TEMP/measures/base.json" \
+            --head "$RUNNER_TEMP/measures/pr.json" \
+            --base-label "\`$BASE_REF\` ($(git rev-parse --short HEAD^1))" \
+            --head-label "this PR (${HEAD_SHA:0:7})" \
+            --output "$RUNNER_TEMP/report/report.md"
+          cat "$RUNNER_TEMP/report/report.md" >> "$GITHUB_STEP_SUMMARY"
+          echo "$PR_NUMBER" > "$RUNNER_TEMP/report/pr-number"
+      - name: Store report
+        uses: actions/upload-artifact@v7
+        with:
+          name: bundle-size-report
+          path: ${{ runner.temp }}/report
+          retention-days: 7
