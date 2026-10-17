@@ -23,24 +23,35 @@ jobs:
       - name: checkout
         uses: actions/checkout@v7
       - uses: perses/github-actions@v0.13.0
-      - uses: ./.github/perses-ci/actions/setup_environment
-        with:
-          enable_npm: true
-          enable_go: true
-          nvmrc_path: './ui/.nvmrc'
-      - name: start dev environment
-        uses: hoverkraft-tech/compose-action@v3.2.0
-        with:
-          compose-file: ./dev/docker-compose.e2e.yaml
+      # Go and Node.js are set up by two separate invocations so they install concurrently.
+      # Running the same composite action twice in parallel races on downloading its nested actions,
+      # so a no-op invocation (all features disabled by default) downloads them first.
+      - name: Download setup actions
+        uses: ./.github/perses-ci/actions/setup_environment
+      - parallel:
+          - name: Setup Go
+            uses: ./.github/perses-ci/actions/setup_environment
+            with:
+              enable_go: true
+          - name: Setup Node.js
+            uses: ./.github/perses-ci/actions/setup_environment
+            with:
+              enable_npm: true
+              nvmrc_path: './ui/.nvmrc'
+          - name: start dev environment
+            uses: hoverkraft-tech/compose-action@v3.2.0
+            with:
+              compose-file: ./dev/docker-compose.e2e.yaml
       - name: Install UI deps
         working-directory: ./ui
         run: npm ci
-      - name: Build the app and all packages
-        working-directory: ./ui
-        run: npm run build
-      - name: Install Playwright Browsers
-        working-directory: ./ui
-        run: npx playwright install --with-deps chromium
+      - parallel:
+          - name: Build the app and all packages
+            working-directory: ./ui
+            run: npm run build
+          - name: Install Playwright Browsers
+            working-directory: ./ui
+            run: npx playwright install --with-deps chromium
       - name: Run Playwright tests
         working-directory: ./ui
         timeout-minutes: 15
