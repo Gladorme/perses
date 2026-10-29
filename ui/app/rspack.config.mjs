@@ -19,7 +19,10 @@ import { ReactRefreshRspackPlugin } from '@rspack/plugin-react-refresh';
 import TerserPlugin from 'terser-webpack-plugin';
 
 const isDev = process.env.NODE_ENV === 'development';
-const isSharedDev = isDev && process.env.SHARED_DEV === 'true';
+// Production build using React's profiling renderer, served by the dev server, to record React Performance Tracks.
+const isProfiling = process.env.PROFILING === 'true';
+const isServed = isDev || isProfiling;
+const isSharedDev = isServed && process.env.SHARED_DEV === 'true';
 
 // When SHARED_DEV=true, resolve shared packages from an adjacent perses/shared checkout (see that repo for linking instructions).
 const sharedPackagesPath = process.env.SHARED_PACKAGES_PATH ?? resolve(import.meta.dirname, '../../../shared');
@@ -28,6 +31,11 @@ const sharedNodeModulesPath = resolve(sharedPackagesPath, 'node_modules');
 
 const localAliases = {
   '@perses-dev/internal-utils': resolve(nodeModulesPath, '@perses-dev/internal-utils/dist'),
+};
+
+// See https://react.dev/reference/dev-tools/react-performance-tracks#using-profiling-builds
+const profilingAliases = {
+  'react-dom/client$': resolve(nodeModulesPath, 'react-dom/profiling.js'),
 };
 
 const sharedAliases = {
@@ -65,21 +73,28 @@ const singletonAliases = {
 export default defineConfig({
   output: {
     path: resolve(import.meta.dirname, './dist'),
-    publicPath: isDev ? undefined : 'PREFIX_PATH_PLACEHOLDER/',
-    filename: isDev ? '[name].js' : '[name].[contenthash].js',
-    cssFilename: isDev ? '[name].css' : '[name].[contenthash].css',
-    cssChunkFilename: isDev ? '[id].css' : '[id].[contenthash].css',
+    publicPath: isServed ? undefined : 'PREFIX_PATH_PLACEHOLDER/',
+    filename: isServed ? '[name].js' : '[name].[contenthash].js',
+    cssFilename: isServed ? '[name].css' : '[name].[contenthash].css',
+    cssChunkFilename: isServed ? '[id].css' : '[id].[contenthash].css',
     clean: true,
   },
   mode: isDev ? 'development' : 'production',
-  devtool: isDev ? 'cheap-module-source-map' : false,
+  devtool: isDev ? 'cheap-module-source-map' : isProfiling ? 'source-map' : false,
   entry: './src/bundle.ts',
   resolve: {
     extensions: ['...', '.ts', '.tsx', '.jsx'],
-    alias: isSharedDev ? { ...sharedAliases, ...localAliases, ...singletonAliases } : {},
+    alias: {
+      ...(isProfiling ? profilingAliases : {}),
+      ...(isSharedDev ? { ...sharedAliases, ...localAliases, ...singletonAliases } : {}),
+    },
   },
   optimization: {
-    minimizer: [new TerserPlugin(), new rspack.LightningCssMinimizerRspackPlugin()],
+    minimizer: [
+      // Keep component names readable in the React Performance Tracks of profiling builds.
+      new TerserPlugin(isProfiling ? { terserOptions: { keep_classnames: true, keep_fnames: true } } : undefined),
+      new rspack.LightningCssMinimizerRspackPlugin(),
+    ],
   },
   module: {
     rules: [
@@ -140,10 +155,10 @@ export default defineConfig({
       },
     ],
   },
-  devServer: isDev
+  devServer: isServed
     ? {
         historyApiFallback: true,
-        hot: true,
+        hot: isDev,
         liveReload: false,
         port: parseInt(process.env.PORT ?? '3000'),
         allowedHosts: 'all',
@@ -165,13 +180,14 @@ export default defineConfig({
   plugins: [
     new rspack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      'process.env.API_PREFIX': JSON.stringify(isDev ? '' : 'PREFIX_PATH_PLACEHOLDER'),
+      'process.env.API_PREFIX': JSON.stringify(isServed ? '' : 'PREFIX_PATH_PLACEHOLDER'),
+      'process.env.PROFILING': JSON.stringify(isProfiling ? 'true' : 'false'),
     }),
     new rspack.ProgressPlugin({}),
     new rspack.HtmlRspackPlugin({
       template: './index.html',
       favicon: './favicon.ico',
-      publicPath: isDev ? '/' : 'PREFIX_PATH_PLACEHOLDER/',
+      publicPath: isServed ? '/' : 'PREFIX_PATH_PLACEHOLDER/',
     }),
     new rspack.CopyRspackPlugin({
       patterns: [

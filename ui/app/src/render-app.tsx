@@ -46,7 +46,16 @@ export function renderApp(container: Element | null): void {
 
   root.render(
     <React.StrictMode>
-      <Router />
+      {process.env.PROFILING === 'true' ? (
+        // Profiling builds only list components rendered under a <Profiler> in the React Performance Tracks.
+        <React.Profiler id="perses" onRender={noop}>
+          <Router />
+        </React.Profiler>
+      ) : (
+        <Router />
+      )}
     </React.StrictMode>,
   );
 }
+
+function noop(): void {}

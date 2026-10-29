@@ -9,9 +9,11 @@ This package contains end-to-end tests for Perses written using [Playwright](htt
     - `base.playwright.config.ts` - Base configuration with common settings.
     - `ci.playwright.config.ts` - Configuration used when running in continuous integration.
     - `local.playwright.config.ts` - Configuration used when running in local development.
+    - `perf.playwright.config.ts` - Configuration recording the dashboard performance profiles.
   - `fixtures` - [Playwright test fixtures](https://playwright.dev/docs/test-fixtures) live here. These are useful for managing common setup and teardown patterns across many tests. See `pages` for managing common page interactions and selectors.
   - `pages` - [Page object models](https://playwright.dev/docs/pom) live here. These are classes that wrap selectors, page interactions, and other common patterns associated with a page. This helps reduce code duplication and improve test maintenance. In addition to pages, it also includes classes for large, complex page elements (e.g. panel editor) that benefit from their own wrappers.
   - `tests` - [Playwright tests](https://playwright.dev/docs/writing-tests) live here and are named following the pattern `testName.spec.ts`.
+  - `perf` - Reproducible dashboard performance profiles based on the React Performance Tracks. See [src/perf/README.md](./src/perf/README.md).
 
 ## Running tests
 

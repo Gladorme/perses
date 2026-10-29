@@ -32,6 +32,11 @@ If you are new to Perses, please review the rest of this README first before sta
 - Change to the `ui` directory.
 - Run the end-to-end tests from the command line: `npm run e2e`
 
+### Profile dashboard performance
+
+- Record reproducible Chrome performance profiles of dashboards, including the React Performance Tracks, and compare
+  them before and after a change: see [e2e/src/perf/README.md](./e2e/src/perf/README.md).
+
 ## Package organization
 
 The UI is split across multiple npm packages so features can be embedded and extended independently. For a full overview of each package, how they relate, and the dependency graph, see [UI package architecture](./ARCHITECTURE.md).

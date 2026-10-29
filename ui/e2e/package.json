@@ -11,6 +11,9 @@
     "e2e:report": "playwright show-report",
     "e2e:watch": "chokidar src/tests/**/**.ts -c 'playwright test {path}'",
     "e2e:ci": "playwright test --config=src/config/ci.playwright.config.ts",
+    "perf": "playwright test --config=src/config/perf.playwright.config.ts",
+    "perf:analyze": "node src/perf/trace-analyzer.ts",
+    "perf:compare": "node src/perf/compare.ts",
     "lint": "oxlint src",
     "lint:fix": "oxlint --fix src"
   },

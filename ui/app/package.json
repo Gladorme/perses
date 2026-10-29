@@ -7,6 +7,7 @@
     "clean": "rimraf dist/",
     "start:shared": "cross-env NODE_ENV=development SHARED_DEV=true rspack serve",
     "start": "cross-env NODE_ENV=development rspack serve",
+    "start:profiling": "cross-env NODE_ENV=production PROFILING=true rspack serve",
     "build": "rspack build",
     "type-check": "tsc --noEmit",
     "test": "cross-env TZ=UTC vitest run",
