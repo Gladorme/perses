@@ -293,7 +293,7 @@ func (e *oIDCEndpoint) auth(ctx *echo.Context) error {
 		opts = append(opts, rp.WithURLParam(redirectURIQueryParam, getRedirectURI(ctx.Request(), utils.AuthnKindOIDC, e.slugID, e.apiPrefix)))
 	}
 	codeExchangeHandler := rp.AuthURLHandler(func() string {
-		redirectPath := ctx.Request().URL.Query().Get(redirectQueryParam)
+		redirectPath := sanitizeRedirectPath(ctx.Request().URL.Query().Get(redirectQueryParam), e.apiPrefix)
 		return encodeOAuthState(redirectPath)
 	}, e.relyingParty, opts...)
 	handler := echo.WrapHandler(codeExchangeHandler)
@@ -311,7 +311,8 @@ func (e *oIDCEndpoint) auth(ctx *echo.Context) error {
 //   - ultimately, generate a Perses user session with an access and refresh token
 func (e *oIDCEndpoint) codeExchange(ctx *echo.Context) error {
 	marshalUserinfo := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, _ rp.RelyingParty, info *oidcUserInfo) {
-		redirectURI := decodeOAuthState(state)
+		// The state went through the browser and the provider: the redirect path is verified again before being used.
+		redirectURI := sanitizeRedirectPath(decodeOAuthState(state), e.apiPrefix)
 
 		setCookie := func(cookie *http.Cookie) {
 			http.SetCookie(w, cookie)

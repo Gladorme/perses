@@ -316,3 +316,45 @@ func decodeOAuthState(state string) string {
 	}
 	return ""
 }
+
+// sanitizeRedirectPath returns redirectPath when it can be safely used to redirect the user after the login.
+// Otherwise, it returns the root path of the application.
+// The redirect path comes from the query param "rd", so it is chosen by whoever built the login link.
+// That is why only a path of the application is accepted, and never a URL leading to another website.
+func sanitizeRedirectPath(redirectPath string, apiPrefix string) string {
+	if isLocalRedirectPath(redirectPath) {
+		return redirectPath
+	}
+	if len(apiPrefix) > 0 {
+		return apiPrefix
+	}
+	return "/"
+}
+
+// isLocalRedirectPath returns true when redirectPath is a path of the current website.
+func isLocalRedirectPath(redirectPath string) bool {
+	// A local path starts with a single slash.
+	if len(redirectPath) == 0 || redirectPath[0] != '/' {
+		return false
+	}
+	// "//host" is a URL relative to the scheme, and the browsers read "/\host" the same way.
+	if len(redirectPath) > 1 && (redirectPath[1] == '/' || redirectPath[1] == '\\') {
+		return false
+	}
+	// The browsers remove the tabs and the new lines from a URL before reading it,
+	// which could turn a harmless looking path into one of the two forms above.
+	for i := 0; i < len(redirectPath); i++ {
+		if redirectPath[i] < 0x20 || redirectPath[i] == 0x7f {
+			return false
+		}
+	}
+	u, err := url.Parse(redirectPath)
+	if err != nil {
+		return false
+	}
+	if u.Scheme != "" || u.Host != "" || u.User != nil || u.Opaque != "" {
+		return false
+	}
+	// The browsers read a backslash of the path as a slash.
+	return !strings.Contains(u.Path, `\`)
+}

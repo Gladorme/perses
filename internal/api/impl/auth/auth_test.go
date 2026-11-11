@@ -20,6 +20,8 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/gorilla/securecookie"
+	"github.com/labstack/echo/v5"
 	"github.com/perses/perses/internal/api/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -70,6 +72,83 @@ func TestDecodeOAuthState(t *testing.T) {
 
 	state = "short--"
 	assert.Equal(t, "", decodeOAuthState(state))
+}
+
+func TestSanitizeRedirectPath(t *testing.T) {
+	testSuite := []struct {
+		title        string
+		redirectPath string
+		apiPrefix    string
+		expected     string
+	}{
+		{title: "empty path falls back to the root", redirectPath: "", expected: "/"},
+		{title: "empty path falls back to the api prefix", redirectPath: "", apiPrefix: "/perses", expected: "/perses"},
+		{title: "root path", redirectPath: "/", expected: "/"},
+		{title: "local path", redirectPath: "/projects/perses/dashboards/demo", expected: "/projects/perses/dashboards/demo"},
+		{title: "local path under the api prefix", redirectPath: "/perses/projects/perses", apiPrefix: "/perses", expected: "/perses/projects/perses"},
+		{title: "local path with a query", redirectPath: "/projects/perses/dashboards/demo?var-job=node&start=1h", expected: "/projects/perses/dashboards/demo?var-job=node&start=1h"},
+		{title: "local path with a fragment", redirectPath: "/projects/perses#section", expected: "/projects/perses#section"},
+		{title: "absolute URL inside a query value is kept", redirectPath: "/explore?link=https://example.com/", expected: "/explore?link=https://example.com/"},
+		{title: "backslash inside a query value is kept", redirectPath: `/explore?filter=a\.b`, expected: `/explore?filter=a\.b`},
+		{title: "percent-encoded slash is kept", redirectPath: "/projects/a%2Fb", expected: "/projects/a%2Fb"},
+		{title: "absolute URL", redirectPath: "https://example.com/", expected: "/"},
+		{title: "absolute URL falls back to the api prefix", redirectPath: "https://example.com/", apiPrefix: "/perses", expected: "/perses"},
+		{title: "absolute URL without path", redirectPath: "http://example.com", expected: "/"},
+		{title: "scheme-relative URL", redirectPath: "//example.com/path", expected: "/"},
+		{title: "backslash after the leading slash", redirectPath: `/\example.com`, expected: "/"},
+		{title: "leading backslashes", redirectPath: `\\example.com`, expected: "/"},
+		{title: "backslash in the path", redirectPath: `/projects\perses`, expected: "/"},
+		{title: "relative path", redirectPath: "projects/perses", expected: "/"},
+		{title: "other scheme", redirectPath: "mailto:someone@example.com", expected: "/"},
+		{title: "tab character", redirectPath: "/\t/example.com", expected: "/"},
+		{title: "new line character", redirectPath: "/projects\n/perses", expected: "/"},
+		{title: "leading space", redirectPath: " /projects/perses", expected: "/"},
+	}
+	for _, test := range testSuite {
+		t.Run(test.title, func(t *testing.T) {
+			assert.Equal(t, test.expected, sanitizeRedirectPath(test.redirectPath, test.apiPrefix))
+		})
+	}
+}
+
+// TestOAuthAuthHandler_SanitizesRedirectPath ensures that a redirect path leading to another website
+// is not kept in the state sent to the provider.
+func TestOAuthAuthHandler_SanitizesRedirectPath(t *testing.T) {
+	testSuite := []struct {
+		title            string
+		redirectPath     string
+		expectedRedirect string
+	}{
+		{title: "local path is kept", redirectPath: "/projects/perses", expectedRedirect: "/projects/perses"},
+		{title: "scheme-relative URL is replaced", redirectPath: "//example.com/path", expectedRedirect: "/"},
+		{title: "absolute URL is replaced", redirectPath: "https://example.com/", expectedRedirect: "/"},
+	}
+	for _, test := range testSuite {
+		t.Run(test.title, func(t *testing.T) {
+			key := securecookie.GenerateRandomKey(16)
+			endpoint := &oAuthEndpoint{
+				conf: oauth2.Config{
+					ClientID:    "client-id",
+					RedirectURL: "https://perses.example.com/api/auth/providers/oauth/test/callback",
+					Endpoint:    oauth2.Endpoint{AuthURL: "https://provider.example.com/authorize"},
+				},
+				secureCookie: securecookie.New(key, key),
+				slugID:       "test",
+			}
+
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, "/api/auth/providers/oauth/test/login?rd="+url.QueryEscape(test.redirectPath), nil)
+			rec := httptest.NewRecorder()
+			ctx := e.NewContext(req, rec)
+
+			require.NoError(t, endpoint.authHandler(ctx))
+			assert.Equal(t, http.StatusFound, rec.Code)
+
+			location, err := url.Parse(rec.Header().Get("Location"))
+			require.NoError(t, err)
+			assert.Equal(t, test.expectedRedirect, decodeOAuthState(location.Query().Get("state")))
+		})
+	}
 }
 
 // TestOAuthRetrieveDeviceAccessToken_UsesProviderHTTPClient ensures the device code token
