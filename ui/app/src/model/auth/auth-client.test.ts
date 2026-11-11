@@ -13,7 +13,7 @@
 
 import { renderHook } from '@testing-library/react';
 
-import { useRedirectQueryParam } from './auth-client';
+import { isLocalRedirectPath, useRedirectQueryParam } from './auth-client';
 
 const { mockUseQueryParam, mockApiPrefix } = vi.hoisted(() => ({
   mockUseQueryParam: vi.fn(),
@@ -97,5 +97,73 @@ describe('useRedirectQueryParam', () => {
     const { result } = renderHook(() => useRedirectQueryParam(true));
 
     expect(result.current).toEqual('/');
+  });
+
+  it.each([
+    ['an absolute URL', 'https://example.com/'],
+    ['a URL relative to the scheme', '//example.com/path'],
+    ['a backslash after the leading slash', '/\\example.com'],
+    ['a tab between two slashes', '/\t/example.com'],
+    ['a relative path', 'projects/perses'],
+    ['another scheme', 'mailto:someone@example.com'],
+  ])('falls back to "/" when the rd query param is %s', (_title, rd) => {
+    mockUseQueryParam.mockReturnValue([rd]);
+
+    const { result } = renderHook(() => useRedirectQueryParam());
+
+    expect(result.current).toEqual('/');
+  });
+
+  it('falls back to "/" when the rd query param is repeated', () => {
+    mockUseQueryParam.mockReturnValue([['/projects/a', '/projects/b']]);
+
+    const { result } = renderHook(() => useRedirectQueryParam());
+
+    expect(result.current).toEqual('/');
+  });
+
+  it('falls back to api_prefix when absolute is true and the rd query param is not a path of the application', () => {
+    mockApiPrefix.current = '/perses';
+    mockUseQueryParam.mockReturnValue(['//example.com/path']);
+
+    const { result } = renderHook(() => useRedirectQueryParam(true));
+
+    expect(result.current).toEqual('/perses');
+  });
+});
+
+describe('isLocalRedirectPath', () => {
+  it.each([
+    '/',
+    '/projects/perses/dashboards/demo',
+    '/explore?explorer=Prometheus-PrometheusExplorer',
+    '/explore?link=https://example.com/',
+    '/explore?filter=a\\.b',
+    '/projects/a%2Fb',
+    '/projects/perses#section',
+  ])('accepts %j', (path) => {
+    expect(isLocalRedirectPath(path)).toBe(true);
+  });
+
+  it.each([
+    undefined,
+    null,
+    '',
+    'https://example.com/',
+    'http://example.com',
+    '//example.com/path',
+    '/\\example.com',
+    '\\\\example.com',
+    'projects/perses',
+    'mailto:someone@example.com',
+    '/\t/example.com',
+    '/\n/example.com',
+    ' /projects/perses',
+  ])('rejects %j', (path) => {
+    expect(isLocalRedirectPath(path)).toBe(false);
+  });
+
+  it('rejects a value that is not a string', () => {
+    expect(isLocalRedirectPath(['/projects/a', '/projects/b'])).toBe(false);
   });
 });
