@@ -2,6 +2,10 @@ name: docker
 on:
   schedule:
     - cron: '0 0 1 * *' # Run on the first day of every month at midnight'
+
+permissions:
+  contents: read
+
 jobs:
   cleanup:
     name: "cleanup old docker images"

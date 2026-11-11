@@ -1,5 +1,9 @@
 name: Branch Deleted
 on: delete
+
+permissions:
+  contents: read
+
 jobs:
   remove-snapshot-tag:
     if: ${{ github.event.ref_type == 'branch'  && startsWith(github.event.ref, 'snapshot/') }}
