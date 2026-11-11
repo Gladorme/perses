@@ -48,6 +48,9 @@ vi.mock('../../model/user-client', () => ({
   }),
 }));
 
+// Only used by the preferences section, mocked to avoid loading the whole app context.
+vi.mock('../../model/project-client', () => ({}));
+
 beforeEach(() => {
   const theme = createTheme();
   render(

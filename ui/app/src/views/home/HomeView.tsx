@@ -14,7 +14,7 @@
 import { Box, Stack } from '@mui/material';
 import type { ProjectResource } from '@perses-dev/client';
 import type { DashboardSelector } from '@perses-dev/spec';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,7 +27,14 @@ import { ImportantDashboards } from './ImportantDashboards';
 import { Projects } from './Projects';
 import { RecentDashboards } from './RecentDashboards';
 
-function HomeView(): ReactElement {
+interface HomeViewProps {
+  /**
+   * Message displayed at the top of the page.
+   */
+  notice?: ReactNode;
+}
+
+function HomeView({ notice }: HomeViewProps): ReactElement {
   // Navigate to the project page if the project has been successfully added
   const navigate = useNavigate();
   const isMobileSize = useIsMobileSize();
@@ -60,6 +67,7 @@ function HomeView(): ReactElement {
 
   return (
     <Stack sx={{ width: '100%', overflowX: 'hidden' }} m={isMobileSize ? 1 : 2} gap={3}>
+      {notice}
       <HomeViewHeroSection
         userProjects={userProjects}
         onAddProjectClick={handleAddProjectDialogOpen}

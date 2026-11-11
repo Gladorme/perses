@@ -12,6 +12,7 @@
 // limitations under the License.
 
 export * from './AppHomePage';
+export * from './AppProfilePage';
 export * from './AppProjectPage';
 export * from './DashboardPage';
 export * from './SearchBar';

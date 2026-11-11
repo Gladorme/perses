@@ -13,3 +13,15 @@ A dashboard's visual elements consist of a set of panels. Each panel displays sp
 The structured format of Perses dashboards is designed to provide an [open, standardized specification](./open-specification.md) that fosters interoperability across observability tools and serves as a solid foundation for managing dashboards as code.
 
 Perses also supports [migration](../migration.md) from Grafana dashboards to its own data model, making it easy to onboard and reuse existing visualizations without starting from scratch.
+
+## Using a dashboard as home page
+
+By default, Perses opens on a home page that lists the projects, the recently viewed dashboards and the important dashboards. Each user can choose to display one of the dashboards they have access to instead:
+
+1. Open your profile with the `G` then `P` keyboard shortcut, or from the account menu when the authentication is enabled, and select the **Preferences** section.
+2. Under **Home page**, select the project and the dashboard to display.
+3. Click on **Save**.
+
+Going to the home page now opens the selected dashboard. To display the default home page again, click on **Use default home page** in the same section.
+
+This preference is stored in the browser, so it applies to this browser only. When the selected dashboard cannot be loaded, for example because it has been deleted, the default home page is displayed instead.

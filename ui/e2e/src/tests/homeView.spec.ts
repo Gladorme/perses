@@ -13,7 +13,7 @@
 
 import { expect, test } from '@playwright/test';
 
-import { AppHomePage, AppProjectPage, DashboardPage } from '../pages';
+import { AppHomePage, AppProfilePage, AppProjectPage, DashboardPage } from '../pages';
 
 test.describe('homeView', () => {
   test('can navigate to a dashboard', async ({ page }) => {
@@ -106,5 +106,29 @@ test.describe('homeView', () => {
 
     // Should no longer see empty state
     await expect(page.getByRole('main')).not.toContainText("Let's get started");
+  });
+
+  test('can use a dashboard as home page', async ({ page }) => {
+    const project = 'testing';
+    const dashboard = 'markdownpanel';
+
+    const homePage = new AppHomePage(page);
+    const profilePage = new AppProfilePage(page);
+
+    await profilePage.gotoPreferences();
+    await profilePage.selectHomeDashboard(project, dashboard);
+
+    // The home page is now the selected dashboard
+    await homePage.goto();
+    await page.waitForURL(new RegExp(`/projects/${project}/dashboards/${dashboard}`));
+    await expect(page.getByTestId('dashboard-toolbar')).toBeVisible();
+
+    await profilePage.gotoPreferences();
+    await profilePage.useDefaultHomePage();
+
+    // The home page is the default one again
+    await homePage.goto();
+    await expect(page.getByRole('button', { name: 'Create Dashboard' })).toBeVisible();
+    await expect(page).toHaveURL('/');
   });
 });

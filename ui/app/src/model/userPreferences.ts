@@ -11,6 +11,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { nameSchema } from '@perses-dev/client';
+import { z } from 'zod';
+
+const homeDashboardSchema = z.object({
+  project: nameSchema,
+  dashboard: nameSchema,
+});
+
+/**
+ * The dashboard a user has chosen to display instead of the default home page.
+ */
+export type HomeDashboard = z.infer<typeof homeDashboardSchema>;
+
 export type UserPreferences = {
   timezone?: string;
+  homeDashboard?: HomeDashboard;
 };
+
+/**
+ * Preferences are read from the browser storage, which can hold anything: a home dashboard that is not a valid
+ * project and dashboard name pair is ignored.
+ */
+export function parseHomeDashboard(value: unknown): HomeDashboard | undefined {
+  const result = homeDashboardSchema.safeParse(value);
+  return result.success ? result.data : undefined;
+}

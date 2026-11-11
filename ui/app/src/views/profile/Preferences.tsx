@@ -11,13 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Box, Button, FormControl, InputLabel, Stack } from '@mui/material';
+import { Box, Button, Divider, FormControl, InputLabel, Stack } from '@mui/material';
 import { TimeZoneSelector, useSnackbar } from '@perses-dev/components';
 import PreferenceIcon from 'mdi-material-ui/MapClock';
 import type { FormEventHandler, ReactElement } from 'react';
 import { useCallback, useState } from 'react';
 
 import { useUserPreferences } from '../../context/UserPreferences';
+import { HomeDashboardPreference } from './HomeDashboardPreference';
 import { ProfileContainer } from './ProfileContainer';
 
 function isTimezoneValid(timezone: string): boolean {
@@ -73,6 +74,8 @@ export const Preferences = (): ReactElement => {
           </Box>
         </Stack>
       </form>
+      <Divider sx={{ my: 2 }} />
+      <HomeDashboardPreference />
     </ProfileContainer>
   );
 };

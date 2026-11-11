@@ -52,7 +52,7 @@ import {
 import DelegatedAuthnErrorView from './views/auth/DelegatedAuthnErrorView';
 import SignInView from './views/auth/SignInView';
 import SignUpView from './views/auth/SignUpView';
-import HomeView from './views/home/HomeView';
+import { UserHomeView } from './views/home/UserHomeView';
 
 // Other routes are lazy-loaded for code-splitting
 const ImportView = lazy(() => import('./views/import/ImportView'));
@@ -120,7 +120,7 @@ const router = createBrowserRouter(
           path: '',
           element: <RequireAuth />,
           children: [
-            { index: true, Component: HomeView, handle: { title: 'Home' } satisfies PageTitleHandle },
+            { index: true, Component: UserHomeView, handle: { title: 'Home' } satisfies PageTitleHandle },
             { path: ProfileRoute, Component: ProfileView, handle: { title: 'Profile' } satisfies PageTitleHandle },
             {
               path: AdminRoute,
