@@ -7,6 +7,25 @@ alerting:
     - static_configs:
         - targets: ['alertmanager:9093']
 
+# Metrics pushed through the OTLP receiver (OTel Demo and synthetic generators, via the otel-gateway collector)
+otlp:
+  keep_identifying_resource_attributes: true
+  promote_resource_attributes:
+    - service.instance.id
+    - service.name
+    - service.namespace
+    - service.version
+    - deployment.environment.name
+    - container.name
+    - host.name
+    - postgresql.database.name
+    - postgresql.table.name
+    - kafka.cluster.alias
+
+storage:
+  tsdb:
+    out_of_order_time_window: 30m
+
 rule_files:
   - /etc/alerting-rules.yaml
 

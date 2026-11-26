@@ -154,5 +154,166 @@
         }
       }
     }
+  },
+  {
+    "kind": "GlobalDatasource",
+    "metadata": {
+      "name": "AlertManagerLocal"
+    },
+    "spec": {
+      "default": true,
+      "plugin": {
+        "kind": "AlertManagerDatasource",
+        "spec": {
+          "proxy": {
+            "kind": "HTTPProxy",
+            "spec": {
+              "url": "http://localhost:9093"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "GlobalDatasource",
+    "metadata": {
+      "name": "JaegerLocal"
+    },
+    "spec": {
+      "default": true,
+      "plugin": {
+        "kind": "JaegerDatasource",
+        "spec": {
+          "proxy": {
+            "kind": "HTTPProxy",
+            "spec": {
+              "url": "http://localhost:16686"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "GlobalDatasource",
+    "metadata": {
+      "name": "ClickHouseLocal"
+    },
+    "spec": {
+      "default": true,
+      "plugin": {
+        "kind": "ClickHouseDatasource",
+        "spec": {
+          "proxy": {
+            "kind": "HTTPProxy",
+            "spec": {
+              "url": "http://localhost:8123"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "GlobalDatasource",
+    "metadata": {
+      "name": "OpenSearchLocal"
+    },
+    "spec": {
+      "default": true,
+      "plugin": {
+        "kind": "OpenSearchDatasource",
+        "spec": {
+          "proxy": {
+            "kind": "HTTPProxy",
+            "spec": {
+              "url": "http://localhost:9200"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "GlobalDatasource",
+    "metadata": {
+      "name": "GreptimeDBLocal"
+    },
+    "spec": {
+      "default": true,
+      "plugin": {
+        "kind": "GreptimeDBDatasource",
+        "spec": {
+          "proxy": {
+            "kind": "HTTPProxy",
+            "spec": {
+              "url": "http://localhost:4000"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "GlobalDatasource",
+    "metadata": {
+      "name": "VictoriaLogsLocal"
+    },
+    "spec": {
+      "default": true,
+      "plugin": {
+        "kind": "VictoriaLogsDatasource",
+        "spec": {
+          "proxy": {
+            "kind": "HTTPProxy",
+            "spec": {
+              "url": "http://localhost:9428"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "GlobalDatasource",
+    "metadata": {
+      "name": "SplunkLocal"
+    },
+    "spec": {
+      "default": true,
+      "plugin": {
+        "kind": "SplunkDatasource",
+        "spec": {
+          "proxy": {
+            "kind": "HTTPProxy",
+            "spec": {
+              "url": "https://localhost:8089",
+              "secret": "splunk-local"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "kind": "GlobalDatasource",
+    "metadata": {
+      "name": "JsonLocal"
+    },
+    "spec": {
+      "default": true,
+      "plugin": {
+        "kind": "JsonDatasource",
+        "spec": {
+          "proxy": {
+            "kind": "HTTPProxy",
+            "spec": {
+              "url": "http://localhost:8070"
+            }
+          }
+        }
+      }
+    }
   }
 ]

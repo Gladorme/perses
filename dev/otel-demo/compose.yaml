@@ -1,0 +1,691 @@
+# OpenTelemetry Demo (https://opentelemetry.io/docs/demo/) for the Perses dev environment.
+#
+# This file is included by ../docker-compose.yaml; all services belong to the `otel-demo` profile.
+# It is adapted from the upstream compose files (compose.yaml + compose.full.yaml) of the demo:
+# https://github.com/open-telemetry/opentelemetry-demo/tree/3.1.0
+# The observability stack of the upstream demo (Grafana, Jaeger, Prometheus, OpenSearch, ...) is replaced by the
+# backends of the Perses dev environment: the demo collector forwards everything to the `otel-gateway` collector,
+# which fans the data out to every running datasource backend.
+#
+# Web store: http://localhost:8081 (override the port with OTEL_DEMO_PORT)
+# Load generator UI: http://localhost:8081/loadgen/
+# Feature flags UI (to trigger failure scenarios): http://localhost:8081/feature
+
+x-otel-demo: &otel-demo
+  profiles: [otel-demo, all]
+  restart: unless-stopped
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "5m"
+      max-file: "2"
+
+# Environment shared by all the demo services.
+x-otel-env: &otel-env
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+  OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: cumulative
+  OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: explicit_bucket_histogram
+  OTEL_RESOURCE_ATTRIBUTES: service.namespace=opentelemetry-demo,service.version=${OTEL_DEMO_VERSION:-3.1.0}
+  FLAGD_HOST: flagd
+  FLAGD_PORT: "8013"
+  IPV6_ENABLED: "false"
+  # Workaround for JVM crashes on Apple M4 (https://bugs.openjdk.org/browse/JDK-8345296):
+  # export _JAVA_OPTIONS="-XX:UseSVE=0" before starting the stack.
+  _JAVA_OPTIONS: ${_JAVA_OPTIONS:-}
+
+x-otel-http-endpoint: &otel-http-endpoint http://otel-collector:4318
+
+services:
+  # ******************
+  # Core Demo Services
+  # ******************
+  ad:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-ad
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    environment:
+      <<: *otel-env
+      AD_PORT: "9555"
+      AD_PROMETHEUS_PORT: "9465"
+      OTEL_EXPORTER_OTLP_ENDPOINT: *otel-http-endpoint
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_SERVICE_NAME: ad
+      OTEL_EXPERIMENTAL_SDK_TELEMETRY_VERSION: latest
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/9555'"]
+      start_period: 20s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      otel-collector:
+        condition: service_started
+      flagd:
+        condition: service_started
+
+  cart:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-cart
+    deploy:
+      resources:
+        limits:
+          memory: 160M
+    environment:
+      <<: *otel-env
+      CART_PORT: "7070"
+      VALKEY_ADDR: valkey-cart:6379
+      OTEL_SERVICE_NAME: cart
+      ASPNETCORE_URLS: http://*:7070
+    depends_on:
+      valkey-cart:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+      flagd:
+        condition: service_started
+
+  checkout:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-checkout
+    deploy:
+      resources:
+        limits:
+          memory: 20M
+    environment:
+      <<: *otel-env
+      CHECKOUT_PORT: "5050"
+      CART_ADDR: cart:7070
+      CURRENCY_ADDR: currency:7001
+      EMAIL_ADDR: http://email:6060
+      PAYMENT_ADDR: payment:50051
+      PRODUCT_CATALOG_ADDR: product-catalog:3550
+      SHIPPING_ADDR: http://shipping:50050
+      KAFKA_ADDR: kafka:9092
+      KAFKA_TOPIC: orders
+      GOMEMLIMIT: 16MiB
+      OTEL_EXPORTER_OTLP_ENDPOINT: *otel-http-endpoint
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_GO_X_OBSERVABILITY: "true"
+      OTEL_SERVICE_NAME: checkout
+    healthcheck:
+      test: ["CMD", "/bin/grpc_health_probe", "-addr=:5050"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      cart:
+        condition: service_started
+      currency:
+        condition: service_healthy
+      email:
+        condition: service_healthy
+      payment:
+        condition: service_healthy
+      product-catalog:
+        condition: service_started
+      shipping:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+      flagd:
+        condition: service_started
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  currency:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-currency
+    deploy:
+      resources:
+        limits:
+          memory: 20M
+    environment:
+      <<: *otel-env
+      CURRENCY_PORT: "7001"
+      VERSION: ${OTEL_DEMO_VERSION:-3.1.0}
+      OTEL_SERVICE_NAME: currency
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 7001"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  email:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-email
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    environment:
+      <<: *otel-env
+      APP_ENV: production
+      EMAIL_PORT: "6060"
+      OTEL_EXPORTER_OTLP_ENDPOINT: *otel-http-endpoint
+      OTEL_SERVICE_NAME: email
+    healthcheck:
+      test: ["CMD", "ruby", "-e", "require 'socket'; TCPSocket.new('localhost', 6060).close"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  frontend:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-frontend
+    deploy:
+      resources:
+        limits:
+          memory: 250M
+    environment:
+      <<: *otel-env
+      PORT: "8080"
+      FRONTEND_ADDR: frontend:8080
+      AD_ADDR: ad:9555
+      CART_ADDR: cart:7070
+      CHECKOUT_ADDR: checkout:5050
+      CURRENCY_ADDR: currency:7001
+      PRODUCT_CATALOG_ADDR: product-catalog:3550
+      RECOMMENDATION_ADDR: recommendation:9001
+      SHIPPING_ADDR: http://shipping:50050
+      ENV_PLATFORM: local
+      OTEL_SERVICE_NAME: frontend
+      PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://localhost:${OTEL_DEMO_PORT:-8081}/otlp-http/v1/traces
+      WEB_OTEL_SERVICE_NAME: frontend-web
+      OTEL_COLLECTOR_HOST: otel-collector
+    healthcheck:
+      test: ["CMD", "/nodejs/bin/node", "-e", "require('net').connect(8080,require('os').hostname(),function(){process.exit(0)}).on('error',function(){process.exit(1)})"]
+      start_period: 60s
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      ad:
+        condition: service_healthy
+      cart:
+        condition: service_started
+      checkout:
+        condition: service_started
+      currency:
+        condition: service_healthy
+      product-catalog:
+        condition: service_started
+      quote:
+        condition: service_healthy
+      recommendation:
+        condition: service_healthy
+      shipping:
+        condition: service_started
+      otel-collector:
+        condition: service_started
+      image-provider:
+        condition: service_healthy
+      flagd:
+        condition: service_started
+
+  frontend-proxy:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-frontend-proxy
+    deploy:
+      resources:
+        limits:
+          memory: 90M
+    ports:
+      - "${OTEL_DEMO_PORT:-8081}:8080"
+    environment:
+      <<: *otel-env
+      ENVOY_ADDR: 0.0.0.0
+      ENVOY_PORT: "8080"
+      ENVOY_ADMIN_PORT: "10000"
+      FRONTEND_HOST: frontend
+      FRONTEND_PORT: "8080"
+      IMAGE_PROVIDER_HOST: image-provider
+      IMAGE_PROVIDER_PORT: "8081"
+      LOCUST_WEB_HOST: load-generator
+      LOCUST_WEB_PORT: "8089"
+      FLAGD_UI_HOST: flagd-ui
+      FLAGD_UI_PORT: "4000"
+      OTEL_COLLECTOR_HOST: otel-collector
+      OTEL_COLLECTOR_PORT_GRPC: "4317"
+      OTEL_COLLECTOR_PORT_HTTP: "4318"
+      OTEL_SERVICE_NAME: frontend-proxy
+      OTEL_SERVICE_NAMESPACE: opentelemetry-demo
+      # The Envoy configuration also routes to the upstream observability tools, which are not part of this setup.
+      # They must still be defined to render the configuration template.
+      GRAFANA_HOST: grafana
+      GRAFANA_PORT: "3000"
+      JAEGER_HOST: jaeger
+      JAEGER_UI_PORT: "16686"
+      OPAMP_SERVER_HOST: opamp-server
+      OPAMP_SERVER_UI_PORT: "4321"
+      FIREPIT_HOST: firepit
+      FIREPIT_PORT: "8080"
+      TELEMETRY_DOCS_HOST: telemetry-docs
+      TELEMETRY_DOCS_PORT: "8000"
+      CHATBOT_HOST: chatbot
+      CHATBOT_PORT: "7860"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/8080"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      frontend:
+        condition: service_healthy
+      load-generator:
+        condition: service_started
+      flagd-ui:
+        condition: service_healthy
+    dns_search: ""
+
+  image-provider:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-image-provider
+    deploy:
+      resources:
+        limits:
+          memory: 120M
+    environment:
+      IMAGE_PROVIDER_PORT: "8081"
+      OTEL_COLLECTOR_HOST: otel-collector
+      OTEL_COLLECTOR_PORT_GRPC: "4317"
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=opentelemetry-demo,service.version=${OTEL_DEMO_VERSION:-3.1.0}
+      OTEL_SERVICE_NAME: image-provider
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/status"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  load-generator:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-load-generator
+    deploy:
+      resources:
+        limits:
+          memory: 1500M
+    environment:
+      <<: *otel-env
+      LOCUST_WEB_PORT: "8089"
+      LOCUST_USERS: ${OTEL_DEMO_LOCUST_USERS:-5}
+      LOCUST_HOST: http://frontend-proxy:8080
+      LOCUST_HEADLESS: "false"
+      LOCUST_AUTOSTART: "true"
+      LOCUST_BROWSER_TRAFFIC_ENABLED: "true"
+      LOCUST_HTTP_USER_WEIGHT: "9"
+      LOCUST_BROWSER_USER_WEIGHT: "1"
+      LOCUST_WEB_HOST: 0.0.0.0
+      FLAGD_OFREP_PORT: "8016"
+      OTEL_SERVICE_NAME: load-generator
+      OTEL_PYTHON_SDK_INTERNAL_METRICS_ENABLED: "true"
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; s=socket.create_connection(('localhost',8089),2); s.close()"]
+      start_period: 30s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      frontend:
+        condition: service_healthy
+      flagd:
+        condition: service_started
+
+  payment:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-payment
+    deploy:
+      resources:
+        limits:
+          memory: 140M
+    environment:
+      <<: *otel-env
+      PAYMENT_PORT: "50051"
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_SERVICE_NAME: payment
+    healthcheck:
+      test:
+        - "CMD"
+        - "/nodejs/bin/node"
+        - "-e"
+        - >-
+          const net=require('net');const c=new net.Socket();
+          c.setTimeout(2000);
+          c.connect(50051,'127.0.0.1',()=>{c.destroy();process.exit(0)});
+          c.on('error',()=>process.exit(1));
+          c.on('timeout',()=>process.exit(1))
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      otel-collector:
+        condition: service_started
+      flagd:
+        condition: service_started
+
+  product-catalog:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-product-catalog
+    deploy:
+      resources:
+        limits:
+          memory: 20M
+    environment:
+      <<: *otel-env
+      PRODUCT_CATALOG_PORT: "3550"
+      GOMEMLIMIT: 16MiB
+      OTEL_GO_X_OBSERVABILITY: "true"
+      OTEL_SERVICE_NAME: product-catalog
+      OTEL_CONFIG_FILE: /otel-config.yml
+      OTEL_SEMCONV_STABILITY_OPT_IN: database
+      DB_CONNECTION_STRING: postgres://astronomy_user:astronomy_password@astronomy-db/astronomy_db?sslmode=disable
+    healthcheck:
+      test: ["CMD", "/bin/grpc_health_probe", "-addr=:3550"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      otel-collector:
+        condition: service_started
+      flagd:
+        condition: service_started
+      astronomy-db:
+        condition: service_healthy
+    volumes:
+      - ./otel-config.yml:/otel-config.yml:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  quote:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-quote
+    deploy:
+      resources:
+        limits:
+          memory: 40M
+    environment:
+      <<: *otel-env
+      QUOTE_PORT: "8090"
+      OTEL_EXPORTER_OTLP_ENDPOINT: *otel-http-endpoint
+      OTEL_PHP_AUTOLOAD_ENABLED: "true"
+      OTEL_PHP_INTERNAL_METRICS_ENABLED: "true"
+      OTEL_SERVICE_NAME: quote
+    healthcheck:
+      test: ["CMD", "php", "-r", "fsockopen('localhost', 8090) or die('fail');"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  recommendation:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-recommendation
+    deploy:
+      resources:
+        limits:
+          memory: 500M
+    environment:
+      <<: *otel-env
+      RECOMMENDATION_PORT: "9001"
+      PRODUCT_CATALOG_ADDR: product-catalog:3550
+      OTEL_PYTHON_LOG_CORRELATION: "true"
+      OTEL_SERVICE_NAME: recommendation
+      OTEL_PYTHON_SDK_INTERNAL_METRICS_ENABLED: "true"
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9001"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      product-catalog:
+        condition: service_started
+      otel-collector:
+        condition: service_started
+      flagd:
+        condition: service_started
+
+  shipping:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-shipping
+    deploy:
+      resources:
+        limits:
+          memory: 20M
+    environment:
+      <<: *otel-env
+      SHIPPING_PORT: "50050"
+      QUOTE_ADDR: http://quote:8090
+      OTEL_EXPORTER_OTLP_ENDPOINT: *otel-http-endpoint
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: shipping
+    healthcheck:
+      test: ["CMD", "/app/healthcheck"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      otel-collector:
+        condition: service_started
+      flagd:
+        condition: service_started
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  # Kafka consumers
+  accounting:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-accounting
+    deploy:
+      resources:
+        limits:
+          memory: 160M
+    environment:
+      <<: *otel-env
+      KAFKA_ADDR: kafka:9092
+      KAFKA_TOPIC: orders
+      OTEL_EXPORTER_OTLP_ENDPOINT: *otel-http-endpoint
+      OTEL_SERVICE_NAME: accounting
+      DB_CONNECTION_STRING: Host=astronomy-db;Username=astronomy_user;Password=astronomy_password;Database=astronomy_db
+      OTEL_DOTNET_AUTO_TRACES_ENTITYFRAMEWORKCORE_INSTRUMENTATION_ENABLED: "false"
+    depends_on:
+      otel-collector:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      astronomy-db:
+        condition: service_healthy
+
+  fraud-detection:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-fraud-detection
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    environment:
+      <<: *otel-env
+      KAFKA_ADDR: kafka:9092
+      KAFKA_TOPIC: orders
+      OTEL_EXPORTER_OTLP_ENDPOINT: *otel-http-endpoint
+      OTEL_INSTRUMENTATION_KAFKA_EXPERIMENTAL_SPAN_ATTRIBUTES: "true"
+      OTEL_INSTRUMENTATION_MESSAGING_EXPERIMENTAL_RECEIVE_TELEMETRY_ENABLED: "true"
+      OTEL_SERVICE_NAME: fraud-detection
+      OTEL_EXPERIMENTAL_SDK_TELEMETRY_VERSION: latest
+    depends_on:
+      otel-collector:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+  # ******************
+  # Dependent Services
+  # ******************
+  # Copy the feature flags definition into a volume, so changes made through the flagd UI don't modify this repository.
+  # Flags are reset to their default values each time the stack is (re)started.
+  flagd-init:
+    <<: *otel-demo
+    image: busybox:1.37
+    restart: "no"
+    command: ["sh", "-c", "cp /seed/demo.flagd.json /data/demo.flagd.json && chmod -R a+rwX /data"]
+    volumes:
+      - ./flagd/demo.flagd.json:/seed/demo.flagd.json:ro
+      - otel-demo-flagd:/data
+
+  flagd:
+    <<: *otel-demo
+    image: ghcr.io/open-feature/flagd:v0.16.0
+    deploy:
+      resources:
+        limits:
+          memory: 75M
+    environment:
+      <<: *otel-env
+      OTEL_EXPORTER_OTLP_ENDPOINT: *otel-http-endpoint
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      GOMEMLIMIT: 60MiB
+      OTEL_SERVICE_NAME: flagd
+    command: ["start", "--uri", "file:./etc/flagd/demo.flagd.json"]
+    volumes:
+      - otel-demo-flagd:/etc/flagd
+    depends_on:
+      flagd-init:
+        condition: service_completed_successfully
+
+  flagd-ui:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-flagd-ui
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    environment:
+      <<: *otel-env
+      FLAGD_UI_PORT: "4000"
+      OTEL_EXPORTER_OTLP_ENDPOINT: *otel-http-endpoint
+      OTEL_SERVICE_NAME: flagd-ui
+      SECRET_KEY_BASE: yYrECL4qbNwleYInGJYvVnSkwJuSQJ4ijPTx5tirGUXrbznFIBFVJdPl5t6O9ASw
+      PHX_HOST: localhost
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/4000"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      otel-collector:
+        condition: service_started
+      flagd:
+        condition: service_started
+    volumes:
+      - otel-demo-flagd:/app/data
+
+  astronomy-db:
+    <<: *otel-demo
+    image: postgres:18.4
+    deploy:
+      resources:
+        limits:
+          memory: 80M
+    command: postgres -c shared_preload_libraries=pg_stat_statements
+    environment:
+      POSTGRES_PASSWORD: changeit
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ./postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  valkey-cart:
+    <<: *otel-demo
+    image: ghcr.io/valkey-io/valkey:9.0.4-alpine3.23
+    user: valkey
+    deploy:
+      resources:
+        limits:
+          memory: 20M
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli ping"]
+      start_period: 5s
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  kafka:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/demo:${OTEL_DEMO_VERSION:-3.1.0}-kafka
+    deploy:
+      resources:
+        limits:
+          memory: 620M
+    environment:
+      <<: *otel-env
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_HEAP_OPTS: -Xmx400m -Xms400m
+      OTEL_EXPORTER_OTLP_ENDPOINT: *otel-http-endpoint
+      OTEL_SERVICE_NAME: kafka
+      OTEL_EXPERIMENTAL_SDK_TELEMETRY_VERSION: latest
+    healthcheck:
+      test: nc -z kafka 9092
+      start_period: 10s
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  # ********************
+  # Telemetry Components
+  # ********************
+  otel-collector:
+    <<: *otel-demo
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.159.0
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+    command: ["--config=/etc/otelcol/config.yaml"]
+    # Required to read the docker socket (container metrics).
+    user: 0:0
+    environment:
+      GOMEMLIMIT: 320MiB
+    volumes:
+      - ./otelcol-config.yaml:/etc/otelcol/config.yaml:ro
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:ro
+    depends_on:
+      otel-gateway:
+        condition: service_started
+
+volumes:
+  otel-demo-flagd:

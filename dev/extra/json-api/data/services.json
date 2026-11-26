@@ -1,0 +1,9 @@
+[
+  { "name": "frontend", "language": "TypeScript", "team": "web", "replicas": 3, "status": "healthy", "latencyP99Ms": 182.4, "errorRate": 0.002 },
+  { "name": "cart", "language": "C#", "team": "commerce", "replicas": 2, "status": "healthy", "latencyP99Ms": 35.1, "errorRate": 0.0 },
+  { "name": "checkout", "language": "Go", "team": "commerce", "replicas": 2, "status": "degraded", "latencyP99Ms": 412.9, "errorRate": 0.031 },
+  { "name": "payment", "language": "JavaScript", "team": "payments", "replicas": 2, "status": "healthy", "latencyP99Ms": 88.7, "errorRate": 0.004 },
+  { "name": "product-catalog", "language": "Go", "team": "catalog", "replicas": 3, "status": "healthy", "latencyP99Ms": 12.3, "errorRate": 0.0 },
+  { "name": "recommendation", "language": "Python", "team": "catalog", "replicas": 1, "status": "down", "latencyP99Ms": null, "errorRate": 1.0 },
+  { "name": "shipping", "language": "Rust", "team": "logistics", "replicas": 2, "status": "healthy", "latencyP99Ms": 21.6, "errorRate": 0.001 }
+]

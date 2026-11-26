@@ -1,0 +1,8 @@
+{
+  "generatedAt": "2026-01-01T00:00:00Z",
+  "incidents": [
+    { "id": "INC-1042", "title": "Checkout latency above SLO", "severity": "major", "service": "checkout", "openedAt": "2026-01-01T08:12:00Z", "resolved": false },
+    { "id": "INC-1041", "title": "Recommendation service unavailable", "severity": "critical", "service": "recommendation", "openedAt": "2025-12-31T22:47:00Z", "resolved": false },
+    { "id": "INC-1037", "title": "Payment provider timeouts", "severity": "minor", "service": "payment", "openedAt": "2025-12-30T14:03:00Z", "resolved": true }
+  ]
+}

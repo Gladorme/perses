@@ -1,0 +1,19 @@
+{
+  "index_patterns": ["otel-logs*"],
+  "template": {
+    "settings": {
+      "number_of_replicas": 0
+    },
+    "mappings": {
+      "properties": {
+        "attributes": { "type": "object", "disable_objects": true },
+        "resource": { "type": "object", "disable_objects": true },
+        "instrumentationScope": {
+          "properties": {
+            "attributes": { "type": "object", "disable_objects": true }
+          }
+        }
+      }
+    }
+  }
+}

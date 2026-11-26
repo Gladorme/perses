@@ -1,0 +1,97 @@
+# Collector used by the OpenTelemetry Demo services (adapted from the upstream demo configuration:
+# https://github.com/open-telemetry/opentelemetry-demo/tree/main/src/otel-collector).
+#
+# It receives the telemetry of the demo services, scrapes the demo infrastructure (Kafka, PostgreSQL,
+# Valkey, nginx, Envoy, containers), computes span metrics and forwards everything to the dev gateway
+# collector (../extra/otel-gateway.yaml), which fans the data out to all the datasource backends.
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        # Browser traces are sent by the demo frontend through the frontend-proxy.
+        cors:
+          allowed_origins:
+            - "http://*"
+            - "https://*"
+          allowed_headers:
+            - "content-type"
+            - "traceparent"
+            - "baggage"
+  http_check/frontend-proxy:
+    targets:
+      - endpoint: http://frontend-proxy:8080
+  nginx:
+    endpoint: http://image-provider:8081/status
+    collection_interval: 10s
+  docker_stats:
+    endpoint: unix:///var/run/docker.sock
+  redis:
+    endpoint: valkey-cart:6379
+    username: valkey
+    collection_interval: 10s
+  postgresql:
+    endpoint: astronomy-db:5432
+    username: monitoring_user
+    password: monitoring_password # defined in postgresql/init.sql
+    tls:
+      insecure: true
+  kafka_metrics:
+    scrapers:
+      - brokers
+      - topics
+      - consumers
+    brokers:
+      - kafka:9092
+    collection_interval: 10s
+  # Scrape the Prometheus `/metrics` endpoint exposed by the ad service.
+  prometheus/ad:
+    config:
+      scrape_configs:
+        - job_name: ad
+          scrape_interval: 10s
+          static_configs:
+            - targets: ["ad:9465"]
+
+processors:
+  memory_limiter:
+    check_interval: 5s
+    limit_percentage: 80
+    spike_limit_percentage: 25
+  resource_detection:
+    detectors: [env, system]
+    system:
+      hostname_sources: ["os"]
+
+connectors:
+  span_metrics:
+
+exporters:
+  otlp_grpc/gateway:
+    endpoint: otel-gateway:4317
+    tls:
+      insecure: true
+    sending_queue:
+      batch:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [resource_detection, memory_limiter]
+      exporters: [otlp_grpc/gateway, span_metrics]
+    metrics:
+      receivers: [otlp, span_metrics, http_check/frontend-proxy, nginx, docker_stats, redis, postgresql, kafka_metrics, prometheus/ad]
+      processors: [resource_detection, memory_limiter]
+      exporters: [otlp_grpc/gateway]
+    logs:
+      receivers: [otlp]
+      processors: [resource_detection, memory_limiter]
+      exporters: [otlp_grpc/gateway]
+  telemetry:
+    logs:
+      level: warn
+      disable_stacktrace: true

@@ -1,0 +1,127 @@
+# OpenTelemetry Collector acting as the telemetry gateway of the dev environment.
+#
+# It receives OTLP data (from the OTel Demo or from the synthetic `telemetrygen-*` generators)
+# and fans it out to every datasource backend supported by the Perses plugins.
+#
+# Backends are optional: each one is started through its own docker compose profile.
+# When a backend is not running, its exporter fails fast and the data is dropped (retries are
+# disabled on purpose), so the other backends keep receiving data without being slowed down.
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 5s
+    limit_percentage: 80
+    spike_limit_percentage: 25
+
+exporters:
+  # Metrics
+  otlp_http/prometheus:
+    sending_queue: { batch: {} }
+    retry_on_failure: { enabled: false }
+    endpoint: http://prometheus:9090/api/v1/otlp
+    tls:
+      insecure: true
+  # Traces
+  otlp_grpc/tempo:
+    sending_queue: { batch: {} }
+    retry_on_failure: { enabled: false }
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+  otlp_grpc/jaeger:
+    sending_queue: { batch: {} }
+    retry_on_failure: { enabled: false }
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+  # Logs
+  otlp_http/loki:
+    sending_queue: { batch: {} }
+    retry_on_failure: { enabled: false }
+    endpoint: http://loki:3100/otlp
+    tls:
+      insecure: true
+  otlp_http/victorialogs:
+    sending_queue: { batch: {} }
+    retry_on_failure: { enabled: false }
+    logs_endpoint: http://victorialogs:9428/insert/opentelemetry/v1/logs
+    tls:
+      insecure: true
+  opensearch:
+    sending_queue: { batch: {} }
+    retry_on_failure: { enabled: false }
+    logs_index: otel-logs
+    http:
+      endpoint: http://opensearch:9200
+      tls:
+        insecure: true
+  splunk_hec:
+    sending_queue: { batch: {} }
+    retry_on_failure: { enabled: false }
+    endpoint: https://splunk:8088/services/collector
+    token: 00000000-0000-0000-0000-000000000000
+    index: main
+    source: otel
+    sourcetype: otel
+    tls:
+      insecure_skip_verify: true
+  # All signals
+  otlp_http/greptimedb:
+    sending_queue: { batch: {} }
+    retry_on_failure: { enabled: false }
+    metrics_endpoint: http://greptimedb:4000/v1/otlp/v1/metrics
+    logs_endpoint: http://greptimedb:4000/v1/otlp/v1/logs
+    headers:
+      X-Greptime-DB-Name: public
+    tls:
+      insecure: true
+  otlp_http/greptimedb-traces:
+    sending_queue: { batch: {} }
+    retry_on_failure: { enabled: false }
+    traces_endpoint: http://greptimedb:4000/v1/otlp/v1/traces
+    headers:
+      X-Greptime-DB-Name: public
+      X-Greptime-Pipeline-Name: greptime_trace_v1
+    tls:
+      insecure: true
+  # The ClickHouse exporter refuses to start when ClickHouse is unreachable, so ClickHouse is fed
+  # through a dedicated collector (see otel-clickhouse.yaml) that only runs with the clickhouse profile.
+  otlp_grpc/clickhouse:
+    sending_queue: { batch: {} }
+    retry_on_failure: { enabled: false }
+    endpoint: otel-clickhouse:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters: [otlp_http/prometheus, otlp_http/greptimedb, otlp_grpc/clickhouse]
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters: [otlp_grpc/tempo, otlp_grpc/jaeger, otlp_http/greptimedb-traces, otlp_grpc/clickhouse]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters:
+        - otlp_http/loki
+        - otlp_http/victorialogs
+        - opensearch
+        - splunk_hec
+        - otlp_http/greptimedb
+        - otlp_grpc/clickhouse
+  telemetry:
+    logs:
+      level: warn
+      disable_stacktrace: true

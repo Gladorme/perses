@@ -224,6 +224,27 @@ INFO[2025-01-04T11:40:04Z] http server started on [::]:8080
 
 The API backend is now available on port 8080 :). You can log in with user: `admin` and password: `password`.
 
+### Datasource backends
+
+[dev/docker-compose.yaml](./dev/docker-compose.yaml) provides a backend for every datasource plugin (Prometheus,
+Alertmanager, Tempo, Loki, Pyroscope, Jaeger, ClickHouse, OpenSearch, GreptimeDB, VictoriaLogs, Splunk and a JSON API),
+each with some generated data. The matching global datasources (`<Backend>Local`) are provisioned from `dev/data`.
+Every backend has its own [Docker Compose profile](https://docs.docker.com/compose/how-tos/profiles/), so you only start
+what you need:
+
+```bash
+# Prometheus and Tempo
+docker compose --file dev/docker-compose.yaml --profile prometheus --profile avalanche --profile tempo up --detach
+# Stop everything
+docker compose --file dev/docker-compose.yaml --profile "*" down
+```
+
+To work with realistic metrics, traces and logs, enable the `otel-demo` profile. It starts the
+[OpenTelemetry Demo](https://opentelemetry.io/docs/demo/) (web store on http://localhost:8081) with Prometheus, Tempo and
+Loki. Its telemetry also goes to every other backend you start (for example `--profile otel-demo --profile clickhouse`).
+The `all` profile starts everything except Splunk, which is heavy. It needs a good amount of memory, so give Docker
+enough of it. See the header of the compose file for the list of profiles and ports.
+
 ### Web App
 
 See the [ui/README.md](./ui/README.md) file for details around the build process and the structure of the web UI. For an overview of UI npm packages and their dependencies, see [ui/ARCHITECTURE.md](./ui/ARCHITECTURE.md).
